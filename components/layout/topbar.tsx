@@ -31,6 +31,8 @@ export function Topbar () {
                 </SheetContent>
             </Sheet>
 
+            <div className="hidden md:block"/>
+            
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="rounded-full p-0" aria-label="Account menu">
@@ -40,7 +42,7 @@ export function Topbar () {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Demo User</DropdownMenuLabel> /*will still change*/
+                    <DropdownMenuLabel>Demo User</DropdownMenuLabel> {/*will still change*/}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>My Profile</DropdownMenuItem>
                     <DropdownMenuItem>Settings</DropdownMenuItem>
