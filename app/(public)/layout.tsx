@@ -25,7 +25,7 @@ export default function PublicLayout ({children}: {children: React.ReactNode}) {
 
             <footer className="border-t py-6">
                 <p className="mx-auto max-w-6xl px-4 text-sm text-muted-foreground">
-                    SkillSwap is a student project for MMSU students. It is not an official
+                    MMXSwap is a student project for MMSU students. It is not an official
                     university service.
                 </p>
             </footer>
