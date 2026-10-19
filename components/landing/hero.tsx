@@ -6,9 +6,11 @@ export function Hero () {
     return (
         <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2 md:py-24">
             <div className="space-y-6">
+                {/*
                 <span className="inline-block rounded-full bg-brand-gold px-3 py-1 text-xs font-semibold text-primary">
                     For MMSU students
                 </span>
+                */}
                 <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
                     Everyone has something to teach.{" "}
                     <span className="text-primary">Everyone has something to learn.</span>
@@ -32,7 +34,7 @@ export function Hero () {
                 alt="Front view of the MMSU FEM Hall"
                 width={1600}
                 height={900}
-                className="h-auto w-full rounded-2xl object-cover"
+                className="h-auto w-full rounded-xl object-cover shadow-lg"
             />
         </section>
     )
