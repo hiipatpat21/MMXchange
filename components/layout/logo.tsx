@@ -10,11 +10,6 @@ export function Logo ({className = ""}: {className?: string}) {
                 height = {72}
                 className = "object-contain"
             />  
-            {/*
-                <div className = "flex size-9  items-center justify-center rounded-lg border-dashed border-primary/50 text-[10px] font-bold text-primary">
-                    LOGO
-                </div>
-            */}
             <span className = "text-lg font-semibold text-primary"> MMXswap </span>
         </div>
     )
