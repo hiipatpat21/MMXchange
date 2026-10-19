@@ -30,6 +30,22 @@ export function Topbar () {
                     </div>
                 </SheetContent>
             </Sheet>
+
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="rounded-full p-0" aria-label="Account menu">
+                        <Avatar>
+                            <AvatarFallback>DU</AvatarFallback>
+                        </Avatar>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Demo User</DropdownMenuLabel> /*will still change*/
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>My Profile</DropdownMenuItem>
+                    <DropdownMenuItem>Settings</DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </header>
     )
 }
