@@ -10,7 +10,7 @@ export function Logo ({className = ""}: {className?: string}) {
                 height = {72}
                 className = "object-contain"
             />  
-            <span className = "text-lg font-semibold text-primary"> MMXswap </span>
+            <span className = "text-lg font-semibold text-primary"> MMXchange </span>
         </div>
     )
 }

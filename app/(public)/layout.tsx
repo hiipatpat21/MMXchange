@@ -7,7 +7,7 @@ export default function PublicLayout ({children}: {children: React.ReactNode}) {
         <div className="flex min-h-screen flex-col">
             <header className="border-b bg-background/80">
                 <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-                    <Link href="/" aria-label="MMXswap home">
+                    <Link href="/" aria-label="MMXchange home">
                         <Logo />
                     </Link>
                     <div className="flex items-center gap-2">
@@ -25,7 +25,7 @@ export default function PublicLayout ({children}: {children: React.ReactNode}) {
 
             <footer className="border-t py-6">
                 <p className="mx-auto max-w-6xl px-4 text-sm text-muted-foreground">
-                    MMXSwap is a student project for MMSU students. It is not an official
+                    MMXchange is a student project for MMSU students. It is not an official
                     university service.
                 </p>
             </footer>

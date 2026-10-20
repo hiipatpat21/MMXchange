@@ -11,7 +11,7 @@ export function HowItWorks() {
     return (
         <section className="bg-muted/40 py-16">
             <div className="mx-auto max-w-6xl px-4">
-                <h2 className="text-center text-3xl font-bold">How MMXswap works</h2>
+                <h2 className="text-center text-3xl font-bold">How MMXchange works</h2>
                 <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
                     {steps.map(({ title, text, icon: Icon }) => (
                         <div key={title} className="rounded-xl border bg-card p-5">
