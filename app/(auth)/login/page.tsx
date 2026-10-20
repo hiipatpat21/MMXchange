@@ -9,7 +9,7 @@ export default function LoginPage() {
         <Card>
             <CardHeader className="flex flex-col items-center text-center">
                 <CardTitle>Welcome back</CardTitle>
-                <CardDescription>Log in to continue to MMXswap.</CardDescription>
+                <CardDescription>Log in to continue to MMXchange.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-2">
