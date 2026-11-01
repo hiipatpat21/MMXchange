@@ -1,3 +1,4 @@
+import { logout } from "@/app/(auth)/actions"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
@@ -46,6 +47,11 @@ export function Topbar () {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>My Profile</DropdownMenuItem>
                     <DropdownMenuItem>Settings</DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <form action={logout}>
+                            <button type="submit" className="w-full text-left">Log out</button>
+                        </form>
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </header>
