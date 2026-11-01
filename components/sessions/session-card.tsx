@@ -11,6 +11,7 @@ export type SessionCardData = {
   capacity: number | null;
   skillName: string | null;
   organizerName: string | null;
+  registered: number;
 };
 
 export function SessionCard({ session }: { session: SessionCardData }) {
@@ -36,7 +37,11 @@ export function SessionCard({ session }: { session: SessionCardData }) {
         <div className="flex items-center gap-2">
           <Users className="size-4" />
           <dd>
-            {session.capacity ? `Up to ${session.capacity} students` : "No participant limit"}
+            {session.capacity === null
+              ? "No participant limit"
+              : session.registered >= session.capacity
+                ? "Full"
+                : `${session.capacity - session.registered} of ${session.capacity} seats left`}
           </dd>
         </div>
       </dl>
