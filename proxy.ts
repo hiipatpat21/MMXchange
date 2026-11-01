@@ -9,6 +9,7 @@ const protectedPaths = [
   "/messages",
   "/forum",
   "/notifications",
+  "/profile"
 ];
 const authPaths = ["/login", "/register"];
 
