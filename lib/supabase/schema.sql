@@ -152,3 +152,109 @@ create policy "Organizers can update their own sessions"
   with check (organizer_id = (select auth.uid()));
 
 grant select, insert, update on public.group_sessions to authenticated;
+
+--registration limit
+create table public.group_session_registrations (
+  session_id uuid not null references public.group_sessions (id) on delete cascade,
+  profile_id uuid not null references public.profiles (id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (session_id, profile_id)
+);
+
+create index group_session_registrations_profile_idx
+  on public.group_session_registrations (profile_id);
+
+alter table public.group_session_registrations enable row level security;
+
+create policy "Students can view their own registrations"
+  on public.group_session_registrations for select
+  to authenticated
+  using (profile_id = (select auth.uid()));
+
+create policy "Organizers can view registrations for their sessions"
+  on public.group_session_registrations for select
+  to authenticated
+  using (
+    exists (
+      select 1 from public.group_sessions s
+      where s.id = session_id and s.organizer_id = (select auth.uid())
+    )
+  );
+
+create policy "Students can cancel their own registration before the session starts"
+  on public.group_session_registrations for delete
+  to authenticated
+  using (
+    profile_id = (select auth.uid())
+    and exists (
+      select 1 from public.group_sessions s
+      where s.id = session_id and s.starts_at > now()
+    )
+  );
+
+grant select, delete on public.group_session_registrations to authenticated;
+
+-- Everyone can see COUNTS (not who registered)
+create function public.registration_counts(p_session_ids uuid[])
+returns table (session_id uuid, registered bigint)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select r.session_id, count(*)
+  from public.group_session_registrations r
+  where r.session_id = any (p_session_ids)
+  group by r.session_id;
+$$;
+
+-- The ONLY way to register
+create function public.register_for_session(p_session_id uuid)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_user uuid := auth.uid();
+  v_session public.group_sessions%rowtype;
+  v_count int;
+begin
+  if v_user is null then return 'not_logged_in'; end if;
+
+  -- Lock this session row so simultaneous registrations take turns
+  select * into v_session
+  from public.group_sessions
+  where id = p_session_id
+  for update;
+
+  if not found then return 'not_found'; end if;
+  if v_session.status <> 'published' then return 'not_open'; end if;
+  if v_session.organizer_id = v_user then return 'is_organizer'; end if;
+  if v_session.starts_at <= now() then return 'closed'; end if;
+  if v_session.registration_deadline is not null
+     and v_session.registration_deadline <= now() then return 'closed'; end if;
+
+  if exists (
+    select 1 from public.group_session_registrations
+    where session_id = p_session_id and profile_id = v_user
+  ) then return 'already_registered'; end if;
+
+  if v_session.capacity is not null then
+    select count(*) into v_count
+    from public.group_session_registrations
+    where session_id = p_session_id;
+    if v_count >= v_session.capacity then return 'full'; end if;
+  end if;
+
+  insert into public.group_session_registrations (session_id, profile_id)
+  values (p_session_id, v_user);
+
+  return 'ok';
+end;
+$$;
+
+revoke execute on function public.register_for_session(uuid) from public, anon;
+grant execute on function public.register_for_session(uuid) to authenticated;
+revoke execute on function public.registration_counts(uuid[]) from public, anon;
+grant execute on function public.registration_counts(uuid[]) to authenticated;
