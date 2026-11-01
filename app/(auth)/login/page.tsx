@@ -20,7 +20,7 @@ export default function LoginPage() {
                     <Label htmlFor="password">Password</Label>
                     <Input id="password" type="password" autoComplete="current-password" />
                 </div>
-                <Button className="w-full" disabled>
+                <Button className="w-full">
                     Log in
                 </Button>
                 <p className="text-center text-sm text-muted-foreground">

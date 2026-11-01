@@ -26,7 +26,7 @@ export default function RegisterPage () {
                     <Label htmlFor="password">Password</Label>
                     <Input id="password" type="password" autoComplete="new-password" />
                 </div>
-                <Button className="w-full" disabled>
+                <Button className="w-full">
                     Sign up
                 </Button>
                 <p className="text-center text-sm text-muted-foreground">
