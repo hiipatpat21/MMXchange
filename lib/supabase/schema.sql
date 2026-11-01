@@ -107,3 +107,48 @@ create policy "Students can remove their own skills"
   using (profile_id = (select auth.uid()));
 
 grant select, insert, delete on public.profile_skills to authenticated;
+
+--group sessions
+create table public.group_sessions (
+  id uuid primary key default gen_random_uuid(),
+  organizer_id uuid not null references public.profiles (id) on delete cascade,
+  skill_id bigint not null references public.skills (id),
+  title text not null check (char_length(title) between 3 and 100),
+  description text not null check (char_length(description) between 10 and 1000),
+  objectives text check (char_length(objectives) <= 500),
+  prerequisites text check (char_length(prerequisites) <= 500),
+  starts_at timestamptz not null,
+  duration_minutes int not null check (duration_minutes between 15 and 480),
+  format text not null check (format in ('in_person', 'online')),
+  venue text not null check (char_length(venue) between 2 and 200),
+  capacity int check (capacity is null or capacity between 1 and 500),
+  registration_deadline timestamptz,
+  status text not null default 'published'
+    check (status in ('published', 'cancelled', 'completed')),
+  created_at timestamptz not null default now()
+);
+
+create index group_sessions_status_starts_idx
+  on public.group_sessions (status, starts_at);
+create index group_sessions_organizer_idx
+  on public.group_sessions (organizer_id);
+
+alter table public.group_sessions enable row level security;
+
+create policy "Logged-in students can view sessions"
+  on public.group_sessions for select
+  to authenticated
+  using (true);
+
+create policy "Students can create their own sessions"
+  on public.group_sessions for insert
+  to authenticated
+  with check (organizer_id = (select auth.uid()));
+
+create policy "Organizers can update their own sessions"
+  on public.group_sessions for update
+  to authenticated
+  using (organizer_id = (select auth.uid()))
+  with check (organizer_id = (select auth.uid()));
+
+grant select, insert, update on public.group_sessions to authenticated;
