@@ -30,6 +30,7 @@ export async function addSkill(formData: FormData) {
   if (error) console.error("addSkill failed:", error.message);
 
   revalidatePath("/skills");
+  revalidatePath("/dashboard");
 }
 
 export async function removeSkill(formData: FormData) {
@@ -50,4 +51,5 @@ export async function removeSkill(formData: FormData) {
   if (error) console.error("removeSkill failed:", error.message);
 
   revalidatePath("/skills");
+  revalidatePath("/dashboard");
 }

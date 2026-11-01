@@ -8,6 +8,7 @@ import { sessionSchema, readSessionForm } from "@/lib/session-validation";
 import { getRegistrationCounts, type SessionActionState } from "@/lib/group-sessions";
 
 function refreshSessions(id?: string) {
+  revalidatePath("/", "layout");
   for (const path of ["/sessions", "/sessions/registered", "/sessions/organized"]) revalidatePath(path);
   if (id) {
     revalidatePath(`/sessions/${id}`);

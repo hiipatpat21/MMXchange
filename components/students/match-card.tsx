@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { StudentIdentity } from "@/components/students/student-card";
 import { SkillBadge } from "@/components/students/skill-badge";
 
-export function MatchCard({ match }: { match: StudentMatch }) {
+export function MatchCard({ match, compact = false }: { match: StudentMatch; compact?: boolean }) {
   return (
     <article className="min-w-0 space-y-4 rounded-xl border bg-card p-5">
       <StudentIdentity student={match.profile} />
@@ -14,7 +14,7 @@ export function MatchCard({ match }: { match: StudentMatch }) {
         <span className="text-sm text-muted-foreground">{match.overlapCount} overlapping {match.overlapCount === 1 ? "skill" : "skills"}</span>
       </div>
       <p className="break-words text-sm">{match.explanation}</p>
-      {[{ title: "They can teach you", skills: match.teachesMe }, { title: "You can teach them", skills: match.iTeachThem }].filter((group) => group.skills.length).map((group) => (
+      {!compact && [{ title: "They can teach you", skills: match.teachesMe }, { title: "You can teach them", skills: match.iTeachThem }].filter((group) => group.skills.length).map((group) => (
         <div key={group.title}>
           <h4 className="mb-2 text-sm font-medium">{group.title}</h4>
           <div className="flex flex-wrap gap-2">{group.skills.map((skill) => <SkillBadge key={skill.id} name={skill.name} />)}</div>

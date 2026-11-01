@@ -21,7 +21,7 @@ export function SessionForm({ skills, initialValues, action = createSession }: {
     <form action={formAction} className="space-y-4 rounded-xl border bg-card p-6">
       {initialValues && <>
         <input type="hidden" name="sessionId" value={initialValues.id} />
-        <p className="text-sm text-muted-foreground">Registered students will be notified of important changes when notifications are added in a later phase.</p>
+        <p className="text-sm text-muted-foreground">Registered students will be notified of important changes to the time, venue, format, or registration deadline.</p>
       </>}
       <div className="space-y-2">
         <Label htmlFor="title">Session title</Label>

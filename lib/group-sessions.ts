@@ -47,9 +47,13 @@ export async function getRegistrationCounts(supabase: SupabaseClient, ids: strin
   return counts;
 }
 
-export async function loadSessionCards(supabase: SupabaseClient, options: { organizerId?: string; registeredId?: string; filters?: SessionFilters } = {}) {
+export async function loadSessionCards(supabase: SupabaseClient, options: {
+  organizerId?: string; registeredId?: string; filters?: SessionFilters;
+  limit?: number; upcomingOnly?: boolean; availableOnly?: boolean;
+  registrationOpenOnly?: boolean; excludeOrganizerId?: string;
+} = {}) {
   const now = Date.now();
-  const rows: SessionRow[] = [];
+  const sessions: SessionCardData[] = [];
   const selection = options.registeredId ? `${groupSessionSelect}, group_session_registrations!inner(profile_id)` : groupSessionSelect;
   let query = supabase.from("group_sessions").select(selection);
   if (options.organizerId) query = query.eq("organizer_id", options.organizerId);
@@ -62,19 +66,29 @@ export async function loadSessionCards(supabase: SupabaseClient, options: { orga
     if (filters?.category) query = query.eq("skills.category", filters.category);
     if (filters?.format) query = query.eq("format", filters.format);
   }
+  if (options.upcomingOnly && (options.organizerId || options.registeredId)) query = query.eq("status", "published").gt("starts_at", new Date(now).toISOString());
+  if (options.registrationOpenOnly) query = query.or(`registration_deadline.is.null,registration_deadline.gt.${new Date(now).toISOString()}`);
+  if (options.excludeOrganizerId) query = query.neq("organizer_id", options.excludeOrganizerId);
   query = query.order("starts_at").order("id");
-  for (let offset = 0; ; offset += 200) {
-    const { data, error } = await query.range(offset, offset + 199);
+  const batchSize = options.limit === undefined ? 200 : 20;
+  for (let offset = 0; ; offset += batchSize) {
+    const { data, error } = await query.range(offset, offset + batchSize - 1);
     if (error) throw new Error("Could not load sessions.");
-    rows.push(...data as unknown as SessionRow[]);
-    if (data.length < 200) break;
+    const rows = data as unknown as SessionRow[];
+    const counts = await getRegistrationCounts(supabase, rows.map((row) => row.id));
+    for (const row of rows) {
+      const registered = counts.get(row.id) ?? 0;
+      if ((options.availableOnly || options.filters?.seats === "1") && row.capacity !== null && registered >= row.capacity) continue;
+      sessions.push({ ...row, registered,
+        skillName: pickOne(row.skills)?.name ?? null,
+        organizerName: pickOne(row.organizer)?.display_name ?? null,
+        displayStatus: getSessionDisplayStatus(row, registered, now, !!options.registeredId),
+      });
+      // Apply the limit after checking capacity, so full sessions cannot hide
+      // an available session farther down the ordered list.
+      if (options.limit !== undefined && sessions.length >= options.limit) return { now, sessions };
+    }
+    if (data.length < batchSize) break;
   }
-  const counts = await getRegistrationCounts(supabase, rows.map((row) => row.id));
-  const sessions: SessionCardData[] = rows.map((row) => ({ ...row,
-    skillName: pickOne(row.skills)?.name ?? null,
-    organizerName: pickOne(row.organizer)?.display_name ?? null,
-    registered: counts.get(row.id) ?? 0,
-    displayStatus: getSessionDisplayStatus(row, counts.get(row.id) ?? 0, now, !!options.registeredId),
-  }));
-  return { now, sessions: options.filters?.seats === "1" ? sessions.filter((session) => session.capacity === null || session.registered < session.capacity) : sessions };
+  return { now, sessions };
 }

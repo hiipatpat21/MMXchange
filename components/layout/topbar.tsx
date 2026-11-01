@@ -14,6 +14,8 @@ import {
 import { Logo } from "@/components/layout/logo";
 import { NavLinks } from "@/components/layout/nav-links";
 import { logout } from "@/app/(auth)/actions";
+import type { NotificationItem } from "@/lib/notifications";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 function getInitials(name: string) {
   return name
@@ -24,7 +26,7 @@ function getInitials(name: string) {
     .join("");
 }
 
-export function Topbar({ displayName }: { displayName: string }) {
+export function Topbar({ displayName, profileError, unreadCount, notifications, notificationsError }: { displayName: string; profileError: boolean; unreadCount: number | null; notifications: NotificationItem[]; notificationsError: boolean }) {
   return (
     <header className="flex h-14 items-center justify-between border-b bg-card px-4">
       <Sheet>
@@ -44,6 +46,8 @@ export function Topbar({ displayName }: { displayName: string }) {
 
       <div className="hidden md:block" />
 
+      <div className="flex items-center gap-2">
+      <NotificationBell unreadCount={unreadCount} notifications={notifications} error={notificationsError} />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="rounded-full p-0" aria-label="Account menu">
@@ -54,6 +58,7 @@ export function Topbar({ displayName }: { displayName: string }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
+          {profileError && <p role="alert" className="max-w-56 px-2 py-1 text-xs text-destructive">Could not load your profile name. Reload to try again.</p>}
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link href="/profile">My Profile</Link>
@@ -70,6 +75,7 @@ export function Topbar({ displayName }: { displayName: string }) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      </div>
     </header>
   );
 }

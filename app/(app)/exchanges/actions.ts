@@ -68,6 +68,7 @@ export async function createExchangeRequest(_previous: ExchangeActionState, form
   if (!id.success) return { error: "Your request was sent, but could not be opened. Check Exchanges." };
   revalidatePath("/exchanges");
   revalidatePath(`/exchanges/${id.data}`);
+  revalidatePath("/", "layout");
   redirect(`/exchanges/${id.data}`);
 }
 
@@ -94,6 +95,7 @@ function sessionResult(data: unknown, error: { message: string } | null, exchang
   if (error) return { error: "Could not update the exchange. Please try again." };
   revalidatePath("/exchanges");
   revalidatePath(`/exchanges/${exchangeId}`);
+  revalidatePath("/", "layout");
   if (data !== "ok") return { error: rejectionMessages[String(data)] ?? "Could not update the exchange." };
   return { message: "Exchange updated." };
 }
@@ -161,6 +163,7 @@ export async function respondToExchange(formData: FormData): Promise<ExchangeAct
   if (error) return { error: "Could not update the exchange. Please try again." };
   revalidatePath("/exchanges");
   revalidatePath(`/exchanges/${parsed.data.exchangeId}`);
+  revalidatePath("/", "layout");
   if (data !== "ok") return { error: rejectionMessages[String(data)] ?? "Could not update the exchange." };
   return { message: "Exchange updated." };
 }
