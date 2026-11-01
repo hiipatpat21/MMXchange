@@ -9,7 +9,7 @@ async function SessionList() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("group_sessions")
-    .select("id, title, starts_at, format, capacity, skills(name), profiles(display_name)")
+    .select("id, title, starts_at, format, capacity, skills(name), profiles!group_sessions_organizer_id_fkey(display_name)")
     .eq("status", "published")
     .gte("starts_at", new Date().toISOString())
     .order("starts_at", { ascending: true });
