@@ -5,16 +5,16 @@ const steps = [
     { title: "Match", text: "See students whose skills complement yours.", icon: Users },
     { title: "Swap", text: "Send a request and agree on what to exchange.", icon: ArrowLeftRight },
     { title: "Learn", text: "Meet up in person or online and teach each other.", icon: BookOpen },
-    { title: "Grow", text: "Share feedback and host sessions of your own.", icon: TrendingUp },
+    { title: "Grow", text: "Keep learning and host a group session of your own.", icon: TrendingUp },
 ]
 export function HowItWorks() {
     return (
-        <section className="bg-muted/40 py-16">
+        <section className="border-y bg-card py-20">
             <div className="mx-auto max-w-6xl px-4">
-                <h2 className="text-center text-3xl font-bold">How MMXchange works</h2>
+                <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">A simple way to learn together.</h2>
                 <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
                     {steps.map(({ title, text, icon: Icon }) => (
-                        <div key={title} className="rounded-xl border bg-card p-5">
+                        <div key={title} className="surface-card p-5">
                             <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                 <Icon className="size-5" />
                             </div>

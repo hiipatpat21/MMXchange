@@ -1,3 +1,4 @@
+import { LoadingState } from "@/components/ui/loading-state";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -16,7 +17,7 @@ async function ProfileLoader() {
     .eq("id", user.id)
     .single();
 
-  if (!profile) return <p>We couldn't find your profile.</p>;
+  if (!profile) return <p role="alert">We couldn&apos;t find your profile.</p>;
   return <ProfileForm profile={profile} />;
 }
 
@@ -24,12 +25,12 @@ export default function ProfilePage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Your profile</h1>
+        <h1 className="page-heading">Your profile</h1>
         <p className="mt-1 text-muted-foreground">
           This is what other students see. Your email and password are never shown.
         </p>
       </div>
-      <Suspense fallback={<p>Loading your profile...</p>}>
+      <Suspense fallback={<LoadingState label="Loading your profile..." variant="form" />}>
         <ProfileLoader />
       </Suspense>
     </div>

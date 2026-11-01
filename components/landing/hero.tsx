@@ -4,16 +4,17 @@ import { Button } from "@/components/ui/button"
 
 export function Hero () {
     return (
-        <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2 md:py-24">
+        <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 md:grid-cols-2 md:py-24 lg:gap-16">
             <div className="space-y-6">
                 {/*
                 <span className="inline-block rounded-full bg-brand-gold px-3 py-1 text-xs font-semibold text-primary">
                     For MMSU students
                 </span>
                 */}
-                <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
-                    Everyone has something to teach.{" "}
-                    <span className="text-primary">Everyone has something to learn.</span>
+                <p className="text-sm font-semibold text-primary">A student learning community</p>
+                <h1 className="text-[2.625rem] font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">
+                    Learn something new.{" "}
+                    <span className="text-primary">Share what you know.</span>
                 </h1>
                 <p className="max-w-prose text-lg text-muted-foreground">
                     Swap skills one-on-one with a fellow student, or join a group session
@@ -34,7 +35,7 @@ export function Hero () {
                 alt="Front view of the MMSU FEM Hall"
                 width={1600}
                 height={900}
-                className="h-auto w-full rounded-xl object-cover shadow-lg"
+                className="h-auto w-full rounded-2xl border object-cover shadow-sm"
             />
         </section>
     )

@@ -5,7 +5,7 @@ const steps = ["Match discovered", "Request sent", "Request accepted", "Session 
 export function ExchangeProgress({ currentStep, nextAction, status }: { currentStep: number; nextAction: string; status: ExchangeStatus }) {
   const ended = status === "cancelled" || status === "declined";
   return (
-    <section className="space-y-4 rounded-xl border bg-card p-5" aria-labelledby="progress-heading">
+    <section className="space-y-4 surface-card p-5" aria-labelledby="progress-heading">
       <h2 id="progress-heading" className="text-lg font-semibold">Exchange progress</h2>
       <ol className="grid gap-3 md:grid-cols-6">
         {steps.map((step, index) => {

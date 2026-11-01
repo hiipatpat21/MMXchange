@@ -5,9 +5,9 @@ import { Logo } from "@/components/layout/logo"
 export default function PublicLayout ({children}: {children: React.ReactNode}) {
     return (
         <div className="flex min-h-screen flex-col">
-            <header className="border-b bg-background/80">
-                <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-                    <Link href="/" aria-label="MMXchange home">
+            <header className="border-b bg-card">
+                <div className="mx-auto flex min-h-20 max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6">
+                    <Link href="/" aria-label="MMXchange home" className="inline-flex min-h-11 items-center rounded-lg">
                         <Logo />
                     </Link>
                     <div className="flex items-center gap-2">
@@ -21,9 +21,9 @@ export default function PublicLayout ({children}: {children: React.ReactNode}) {
                 </div>
             </header>
 
-            <div className="flex-1">{children}</div>
+            <main id="main-content" tabIndex={-1} className="flex-1 outline-none">{children}</main>
 
-            <footer className="border-t py-6">
+            <footer className="border-t bg-card py-8">
                 <p className="mx-auto max-w-6xl px-4 text-sm text-muted-foreground">
                     MMXchange is a student project for MMSU students. It is not an official
                     university service.

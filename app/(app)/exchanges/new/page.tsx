@@ -1,3 +1,4 @@
+import { LoadingState } from "@/components/ui/loading-state";
 import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
@@ -10,7 +11,7 @@ import { Button } from "@/components/ui/button";
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 function RequestNotice({ children, href = "/discover", action = "Browse students" }: { children: React.ReactNode; href?: string; action?: string }) {
-  return <div className="space-y-4 rounded-xl border bg-card p-5"><p>{children}</p><Button asChild variant="outline" className="min-h-10"><Link href={href}>{action}</Link></Button></div>;
+  return <div className="space-y-4 surface-card p-5"><p>{children}</p><Button asChild variant="outline" className="min-h-11"><Link href={href}>{action}</Link></Button></div>;
 }
 
 async function RequestLoader({ searchParams }: { searchParams: SearchParams }) {
@@ -43,8 +44,8 @@ async function RequestLoader({ searchParams }: { searchParams: SearchParams }) {
 export default function NewExchangePage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <header><h1 className="text-2xl font-semibold">Request an exchange</h1><p className="mt-1 text-muted-foreground">Offer a skill and ask to learn one in return.</p></header>
-      <Suspense fallback={<p role="status">Loading request form...</p>}><RequestLoader searchParams={searchParams} /></Suspense>
+      <header><h1 className="page-heading">Request an exchange</h1><p className="mt-1 text-muted-foreground">Offer a skill and ask to learn one in return.</p></header>
+      <Suspense fallback={<LoadingState label="Loading request form..." variant="form" />}><RequestLoader searchParams={searchParams} /></Suspense>
     </div>
   );
 }

@@ -6,10 +6,10 @@ export function DashboardSection({ title, href, actionLabel, children }: {
 }) {
   const id = `dashboard-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   return (
-    <section aria-labelledby={id} className="min-w-0 space-y-4 rounded-xl border bg-card p-5">
+    <section aria-labelledby={id} className="min-w-0 space-y-4 surface-card p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id={id} className="text-lg font-semibold">{title}</h2>
-        {href && actionLabel && <Button asChild variant="outline" className="min-h-10"><Link href={href}>{actionLabel}</Link></Button>}
+        {href && actionLabel && <Button asChild variant="outline" className="min-h-11"><Link href={href}>{actionLabel}</Link></Button>}
       </div>
       {children}
     </section>
@@ -17,7 +17,7 @@ export function DashboardSection({ title, href, actionLabel, children }: {
 }
 
 export function DashboardEmpty({ message, href, label }: { message: string; href: string; label: string }) {
-  return <div className="space-y-3"><p className="text-sm text-muted-foreground">{message}</p><Button asChild className="min-h-10"><Link href={href}>{label}</Link></Button></div>;
+  return <div className="space-y-3"><p className="text-sm text-muted-foreground">{message}</p><Button asChild className="min-h-11"><Link href={href}>{label}</Link></Button></div>;
 }
 
 export function DashboardError({ title }: { title: string }) {

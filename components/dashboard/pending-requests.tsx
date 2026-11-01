@@ -26,7 +26,7 @@ export async function PendingRequests() {
               <p className="break-words font-medium">{view.otherName}</p>
               <p className="break-words text-sm text-muted-foreground">You teach {view.youTeach}; they teach {view.theyTeach}.</p>
               <p className="text-xs text-muted-foreground">{formatDateTime(exchange.created_at)}</p>
-              <Link href={`/exchanges/${exchange.id}`} className="inline-flex min-h-10 items-center text-sm font-medium text-primary underline">{group.action}<span className="sr-only"> with {view.otherName}</span></Link>
+              <Link href={`/exchanges/${exchange.id}`} className="inline-flex min-h-11 items-center text-sm font-medium text-primary underline">{group.action}<span className="sr-only"> with {view.otherName}</span></Link>
             </li>;
           })}</ul>}
         </div>

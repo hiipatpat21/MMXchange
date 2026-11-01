@@ -1,3 +1,4 @@
+import { LoadingState } from "@/components/ui/loading-state";
 import Link from "next/link";
 import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
@@ -42,11 +43,11 @@ async function ExchangeDetail({ params }: { params: Promise<{ id: string }> }) {
     <article className="mx-auto max-w-2xl space-y-6">
       <header className="space-y-3">
         <StatusBadge status={exchange.status} />
-        <h1 className="break-words text-2xl font-semibold">Exchange with {view.otherName}</h1>
+        <h1 className="break-words page-heading">Exchange with {view.otherName}</h1>
         <p className="text-sm text-muted-foreground">Requested {formatDateTime(exchange.created_at)}</p>
       </header>
       {progress && <ExchangeProgress currentStep={progress.currentStep} nextAction={progress.nextAction} status={exchange.status} />}
-      <section className="space-y-4 rounded-xl border bg-card p-5">
+      <section className="space-y-4 surface-card p-5">
         <h2 className="text-lg font-semibold">Exchange summary</h2>
         <p className="break-words text-sm">Requested by <Link className="text-primary underline" href={`/students/${exchange.requester_id}`}>{pickOne(exchange.requester)?.display_name ?? "Student"}</Link> for <Link className="text-primary underline" href={`/students/${exchange.recipient_id}`}>{pickOne(exchange.recipient)?.display_name ?? "Student"}</Link>.</p>
         <dl className="space-y-3 break-words">
@@ -63,7 +64,7 @@ async function ExchangeDetail({ params }: { params: Promise<{ id: string }> }) {
           })}
         </div>}
       </section>
-      <section className="space-y-4 rounded-xl border bg-card p-5">
+      <section className="space-y-4 surface-card p-5">
         <h2 className="text-lg font-semibold">Request details</h2>
         <dl className="space-y-4 break-words">
           <div><dt className="font-medium">Message</dt><dd className="mt-1 whitespace-pre-line text-muted-foreground">{exchange.message}</dd></div>
@@ -72,7 +73,7 @@ async function ExchangeDetail({ params }: { params: Promise<{ id: string }> }) {
         </dl>
       </section>
       {sessionsError ? <p role="alert" className="text-destructive">Could not load sessions. Please reload to try again. On a new setup, run the prompt 3 SQL first.</p> : <ExchangeSessionList exchangeId={id} sessions={sessions} teachers={teachers} editable={editable} />}
-      {(exchange.status === "scheduled" || exchange.status === "completed") && <section className="space-y-3 rounded-xl border bg-card p-5">
+      {(exchange.status === "scheduled" || exchange.status === "completed") && <section className="space-y-3 surface-card p-5">
         <h2 className="text-lg font-semibold">Completion confirmations</h2>
         <p className="text-sm text-muted-foreground">Both students must confirm after at least one non-cancelled session has started. Confirm only when you consider the exchange finished.</p>
         <ul className="space-y-2 text-sm">
@@ -81,11 +82,11 @@ async function ExchangeDetail({ params }: { params: Promise<{ id: string }> }) {
         {progress?.canComplete && <ExchangeSessionAction id={id} type="complete" />}
       </section>}
       {(canRespond || canCancel) && <ExchangeResponse exchangeId={id} canRespond={canRespond} />}
-      <Link href="/exchanges" className="inline-flex min-h-10 items-center text-sm text-primary underline">Back to exchanges</Link>
+      <Link href="/exchanges" className="inline-flex min-h-11 items-center text-sm text-primary underline">Back to exchanges</Link>
     </article>
   );
 }
 
 export default function ExchangeDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  return <Suspense fallback={<p role="status">Loading exchange...</p>}><ExchangeDetail params={params} /></Suspense>;
+  return <Suspense fallback={<LoadingState label="Loading exchange..." />}><ExchangeDetail params={params} /></Suspense>;
 }

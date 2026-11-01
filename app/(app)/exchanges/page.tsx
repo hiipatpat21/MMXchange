@@ -1,3 +1,4 @@
+import { LoadingState } from "@/components/ui/loading-state";
 import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
@@ -46,19 +47,19 @@ async function ExchangeList({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="space-y-5">
       <nav aria-label="Exchange filters" className="flex flex-wrap gap-2">
-        {tabs.map((key) => <Button key={key} asChild variant={tab === key ? "default" : "outline"} className="min-h-10"><Link href={`/exchanges?tab=${key}`} aria-current={tab === key ? "page" : undefined}>{labels[key]} ({counts[key]})</Link></Button>)}
+        {tabs.map((key) => <Button key={key} asChild variant={tab === key ? "default" : "outline"} className="min-h-11"><Link href={`/exchanges?tab=${key}`} aria-current={tab === key ? "page" : undefined}>{labels[key]} ({counts[key]})</Link></Button>)}
       </nav>
       {exchanges.length ? (
         <div className="grid gap-4 lg:grid-cols-2">{exchanges.map((exchange) => <ExchangeCard key={exchange.id} exchange={exchange} userId={user.id} />)}</div>
       ) : (
         <div className="space-y-3 rounded-xl border border-dashed p-6">
           <p>{page > 1 ? "No exchanges on this page." : emptyMessages[tab]}</p>
-          <Button asChild variant="outline" className="min-h-10"><Link href={page > 1 ? `/exchanges?tab=${tab}` : "/discover"}>{page > 1 ? "Back to first page" : "Discover students"}</Link></Button>
+          <Button asChild variant="outline" className="min-h-11"><Link href={page > 1 ? `/exchanges?tab=${tab}` : "/discover"}>{page > 1 ? "Back to first page" : "Discover students"}</Link></Button>
         </div>
       )}
       <nav aria-label="Exchange pages" className="flex flex-wrap gap-3">
-        {page > 1 && <Button asChild variant="outline" className="min-h-10"><Link href={`/exchanges?tab=${tab}&page=${page - 1}`}>Previous</Link></Button>}
-        {counts[tab] > page * 30 && <Button asChild variant="outline" className="min-h-10"><Link href={`/exchanges?tab=${tab}&page=${page + 1}`}>Next</Link></Button>}
+        {page > 1 && <Button asChild variant="outline" className="min-h-11"><Link href={`/exchanges?tab=${tab}&page=${page - 1}`}>Previous</Link></Button>}
+        {counts[tab] > page * 30 && <Button asChild variant="outline" className="min-h-11"><Link href={`/exchanges?tab=${tab}&page=${page + 1}`}>Next</Link></Button>}
       </nav>
     </div>
   );
@@ -67,8 +68,8 @@ async function ExchangeList({ searchParams }: { searchParams: SearchParams }) {
 export default function ExchangesPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="space-y-6">
-      <header><h1 className="text-2xl font-semibold">Your exchanges</h1><p className="mt-1 text-muted-foreground">Review requests and follow your one-on-one learning exchanges.</p></header>
-      <Suspense fallback={<p role="status">Loading exchanges...</p>}><ExchangeList searchParams={searchParams} /></Suspense>
+      <header><h1 className="page-heading">Your exchanges</h1><p className="mt-1 text-muted-foreground">Review requests and follow your one-on-one learning exchanges.</p></header>
+      <Suspense fallback={<LoadingState label="Loading exchanges..." />}><ExchangeList searchParams={searchParams} /></Suspense>
     </div>
   );
 }

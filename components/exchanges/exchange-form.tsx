@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-const selectClass = "h-10 w-full min-w-0 rounded-md border bg-background px-3 text-sm focus-visible:outline-2 focus-visible:outline-primary";
+const selectClass = "h-11 w-full min-w-0 rounded-xl border border-input bg-card px-3 text-base sm:text-sm focus-visible:outline-2 focus-visible:outline-primary";
 
 export function ExchangeForm({ recipientId, recipientName, learnSkills, teachSkills, initialLearn, initialTeach }: {
   recipientId: string;
@@ -19,7 +19,7 @@ export function ExchangeForm({ recipientId, recipientName, learnSkills, teachSki
 }) {
   const [state, formAction, pending] = useActionState(createExchangeRequest, null);
   return (
-    <form action={formAction} className="space-y-5 rounded-xl border bg-card p-5">
+    <form action={formAction} className="space-y-5 surface-card p-5">
       <input type="hidden" name="recipientId" value={recipientId} />
       <p className="break-words text-sm text-muted-foreground">Request an exchange with {recipientName}. You each teach one skill.</p>
       <div className="space-y-2">
@@ -47,16 +47,23 @@ export function ExchangeForm({ recipientId, recipientName, learnSkills, teachSki
           <option value="in_person">In person</option><option value="online">Online</option><option value="either">Either</option>
         </select>
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="availability">Availability (optional)</Label>
-        <Textarea id="availability" name="availability" rows={2} maxLength={300} placeholder="Days and times that usually work for you" />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="notes">Learning goals (optional)</Label>
-        <Textarea id="notes" name="notes" rows={3} maxLength={500} />
-      </div>
+
+      <details className="rounded-xl border bg-background/50 p-4">
+        <summary className="text-sm font-medium">Availability and learning goals <span className="font-normal text-muted-foreground">(optional)</span></summary>
+        <div className="space-y-5 pt-3">
+          <div className="space-y-2">
+            <Label htmlFor="availability">Availability (optional)</Label>
+            <Textarea id="availability" name="availability" rows={2} maxLength={300} placeholder="Days and times that usually work for you" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="notes">Learning goals (optional)</Label>
+            <Textarea id="notes" name="notes" rows={3} maxLength={500} />
+          </div>
+        </div>
+      </details>
+
       {state?.error && <p role="alert" className="text-sm text-destructive">{state.error}</p>}
-      <Button type="submit" disabled={pending} className="min-h-10">{pending ? "Sending..." : "Send request"}</Button>
+      <Button type="submit" disabled={pending} className="min-h-11">{pending ? "Sending..." : "Send request"}</Button>
     </form>
   );
 }

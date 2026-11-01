@@ -17,11 +17,11 @@ const ways = [
 
 export function TwoWays () {
     return (
-        <section className="mx-auto max-w-6xl px-4 py-16">
-            <h2 className="text-center text-3xl font-bold">Two ways to learn</h2>
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+            <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">Your learning, your way.</h2>
             <div className="mt-10 grid gap-6 md:grid-cols-2">
                 {ways.map(({ title, text, note, icon: Icon }) => (
-                    <div key={title} className="rounded-xl border bg-card p-6">
+                    <div key={title} className="surface-card p-6">
                         <div className="flex size-11 items-center justify-center rounded-lg bg-brand-gold text-primary">
                             <Icon className="size-5"/>  
                         </div>

@@ -6,12 +6,12 @@ import { Label } from "@/components/ui/label";
 
 export type StudentFilters = { q: string; category: string; skill: string; college: string };
 export type FilterSkill = { id: number; name: string; category: string };
-const selectClass = "h-10 w-full min-w-0 rounded-md border bg-background px-3 text-sm focus-visible:outline-2 focus-visible:outline-primary";
+const selectClass = "h-11 w-full min-w-0 rounded-xl border border-input bg-card px-3 text-base sm:text-sm focus-visible:outline-2 focus-visible:outline-primary";
 
 export function StudentFiltersForm({ filters, skills }: { filters: StudentFilters; skills: FilterSkill[] }) {
   const categories = [...new Set(skills.map((skill) => skill.category))].sort();
   return (
-    <form action="/discover" method="get" className="grid gap-4 rounded-xl border bg-card p-5 sm:grid-cols-2" key={JSON.stringify(filters)}>
+    <form action="/discover" method="get" className="grid gap-4 surface-card p-5 sm:grid-cols-2" key={JSON.stringify(filters)}>
       <div className="min-w-0 space-y-2">
         <Label htmlFor="q">Student name</Label>
         <Input id="q" name="q" defaultValue={filters.q} maxLength={100} placeholder="Search by name" className="h-10" />
@@ -38,8 +38,8 @@ export function StudentFiltersForm({ filters, skills }: { filters: StudentFilter
         </select>
       </div>
       <div className="flex flex-wrap gap-2 sm:col-span-2">
-        <Button type="submit" className="min-h-10">Apply filters</Button>
-        <Button asChild variant="outline" className="min-h-10"><Link href="/discover">Clear filters</Link></Button>
+        <Button type="submit" className="min-h-11">Apply filters</Button>
+        <Button asChild variant="outline" className="min-h-11"><Link href="/discover">Clear filters</Link></Button>
       </div>
     </form>
   );

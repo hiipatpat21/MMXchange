@@ -1,3 +1,4 @@
+import { LoadingState } from "@/components/ui/loading-state";
 import Link from "next/link";
 import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
@@ -22,16 +23,16 @@ async function StudentProfile({ params }: { params: Promise<{ id: string }> }) {
   const ownProfile = user.id === id;
   return (
     <article className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">Student profile</h1>
-      <div className="space-y-4 rounded-xl border bg-card p-5">
+      <h1 className="page-heading">Student profile</h1>
+      <div className="space-y-4 surface-card p-5">
         <StudentIdentity student={profile} heading="h2" />
         <p className="whitespace-pre-line break-words text-muted-foreground">{profile.bio || "No introduction added yet."}</p>
-        <Button asChild className="min-h-10"><Link href={ownProfile ? "/profile" : `/exchanges/new?to=${id}`}>{ownProfile ? "Edit profile" : "Request exchange"}</Link></Button>
+        <Button asChild className="min-h-11"><Link href={ownProfile ? "/profile" : `/exchanges/new?to=${id}`}>{ownProfile ? "Edit profile" : "Request exchange"}</Link></Button>
       </div>
       {skillsError ? <p role="alert" className="text-destructive">Could not load this student&apos;s skills. Please reload to try again.</p> : ([{ kind: "teach", title: "Can teach" }, { kind: "learn", title: "Wants to learn" }].map((group) => {
         const skills = (rows ?? []).filter((row) => row.kind === group.kind);
         return (
-          <section key={group.kind} className="space-y-3 rounded-xl border bg-card p-5">
+          <section key={group.kind} className="space-y-3 surface-card p-5">
             <h2 className="text-lg font-semibold">{group.title}</h2>
             {skills.length ? <div className="flex flex-wrap gap-2">{skills.map((row) => <SkillBadge key={row.skill_id} name={pickOne<{ name: string }>(row.skills)?.name ?? "Unnamed skill"} />)}</div> : (
               <p className="text-sm text-muted-foreground">No skills added here yet. {ownProfile ? <Link href="/skills" className="text-primary underline">Add your skills</Link> : <Link href="/discover" className="text-primary underline">Browse other students</Link>}</p>
@@ -39,11 +40,11 @@ async function StudentProfile({ params }: { params: Promise<{ id: string }> }) {
           </section>
         );
       }))}
-      <Link href="/discover" className="inline-flex min-h-10 items-center text-sm text-primary underline">Back to Discover</Link>
+      <Link href="/discover" className="inline-flex min-h-11 items-center text-sm text-primary underline">Back to Discover</Link>
     </article>
   );
 }
 
 export default function StudentProfilePage({ params }: { params: Promise<{ id: string }> }) {
-  return <Suspense fallback={<p role="status">Loading student profile...</p>}><StudentProfile params={params} /></Suspense>;
+  return <Suspense fallback={<LoadingState label="Loading student profile..." />}><StudentProfile params={params} /></Suspense>;
 }

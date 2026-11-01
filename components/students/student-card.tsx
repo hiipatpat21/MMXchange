@@ -18,10 +18,10 @@ export function StudentIdentity({ student, heading = "h3" }: { student: Pick<Stu
 
 export function StudentCard({ student }: { student: StudentProfile }) {
   return (
-    <article className="min-w-0 space-y-4 rounded-xl border bg-card p-5 transition-shadow hover:shadow-sm">
+    <article className="min-w-0 space-y-4 surface-card p-5 transition-shadow hover:shadow-sm">
       <StudentIdentity student={student} />
       {student.bio && <p className="line-clamp-3 break-words text-sm text-muted-foreground">{student.bio}</p>}
-      <Button asChild variant="outline" className="min-h-10"><Link href={`/students/${student.id}`}>View profile<span className="sr-only"> of {student.display_name}</span></Link></Button>
+      <Button asChild variant="outline" className="min-h-11"><Link href={`/students/${student.id}`}>View profile<span className="sr-only"> of {student.display_name}</span></Link></Button>
     </article>
   );
 }

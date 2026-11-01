@@ -7,7 +7,7 @@ import { SkillBadge } from "@/components/students/skill-badge";
 
 export function MatchCard({ match, compact = false }: { match: StudentMatch; compact?: boolean }) {
   return (
-    <article className="min-w-0 space-y-4 rounded-xl border bg-card p-5">
+    <article className="min-w-0 space-y-4 surface-card p-5">
       <StudentIdentity student={match.profile} />
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant={match.mutual ? "default" : "outline"}>{match.mutual ? "Mutual match" : match.teachesMe.length ? "Can teach you" : "You can teach them"}</Badge>
@@ -21,8 +21,8 @@ export function MatchCard({ match, compact = false }: { match: StudentMatch; com
         </div>
       ))}
       <div className="flex flex-wrap gap-2">
-        <Button asChild variant="outline" className="min-h-10"><Link href={`/students/${match.profile.id}`}>View profile</Link></Button>
-        <Button asChild className="min-h-10"><Link href={`/exchanges/new?to=${match.profile.id}`}>Request exchange</Link></Button>
+        <Button asChild variant="outline" className="min-h-11"><Link href={`/students/${match.profile.id}`}>View profile</Link></Button>
+        <Button asChild className="min-h-11"><Link href={`/exchanges/new?to=${match.profile.id}`}>Request exchange</Link></Button>
       </div>
     </article>
   );

@@ -9,7 +9,7 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 export function NotificationOpenForm({ item, inMenu = false }: { item: NotificationItem; inMenu?: boolean }) {
   const [state, action, pending] = useActionState(markReadAndGo, null);
   const button = (
-    <button type="submit" disabled={pending} className={`block min-h-10 w-full rounded-lg p-3 text-left focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-60 ${item.read_at ? "hover:bg-muted" : "bg-primary/5 hover:bg-primary/10"}`}>
+    <button type="submit" disabled={pending} className={`block min-h-11 w-full rounded-lg p-3 text-left focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-60 ${item.read_at ? "hover:bg-muted" : "bg-primary/5 hover:bg-primary/10"}`}>
       <span className="flex items-start gap-2">
         {!item.read_at && <span aria-hidden="true" className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" />}
         <span className="min-w-0 space-y-1">

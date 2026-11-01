@@ -24,7 +24,7 @@ export async function UpcomingExchanges() {
         const other = exchange ? pickOne(exchange.requester_id === user.id ? exchange.recipient : exchange.requester)?.display_name : null;
         const skill = pickOne<{ name: string }>(session.skills)?.name;
         return <li key={session.id} className="py-3">
-          <Link href={`/exchanges/${session.exchange_id}`} className="block min-h-10 space-y-1 rounded-lg p-2 focus-visible:outline-2 focus-visible:outline-primary hover:bg-muted">
+          <Link href={`/exchanges/${session.exchange_id}`} className="block min-h-11 space-y-1 rounded-lg p-2 focus-visible:outline-2 focus-visible:outline-primary hover:bg-muted">
             <p className="break-words font-medium">{skill ?? "Skill exchange"} with {other ?? "your partner"}</p>
             <p className="text-sm text-muted-foreground">{formatDateTime(session.starts_at)} · {session.duration_minutes} minutes</p>
             <span className="text-sm text-primary underline">View exchange</span>

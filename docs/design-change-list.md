@@ -1,0 +1,77 @@
+# Design pass ? changed files
+
+This pass applies `design-guide.md` to the existing interface. No database SQL or server-action logic changed.
+
+- `app/(app)/dashboard/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/discover/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/error.tsx` ? Friendly retry screen with working recovery controls.
+- `app/(app)/exchanges/[id]/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/exchanges/new/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/exchanges/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/layout.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/not-found.tsx` ? Friendly recovery screen with a working return link.
+- `app/(app)/notifications/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/profile/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/sessions/[id]/edit/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/sessions/[id]/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/sessions/new/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/sessions/organized/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/sessions/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/sessions/registered/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/skills/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(app)/students/[id]/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(auth)/layout.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(auth)/login/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(auth)/register/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/(public)/layout.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `app/globals.css` ? System typography, neutral surfaces, shared design utilities, focus and reduced-motion styles.
+- `app/layout.tsx` ? System fonts, MMXchange metadata and keyboard skip link.
+- `app/not-found.tsx` ? Friendly recovery screen with a working return link.
+- `app/test-supabase/page.tsx` ? Consistent headings, loading states, cards and responsive spacing.
+- `components/dashboard/dashboard-section.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/dashboard/pending-requests.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/dashboard/profile-checklist.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/dashboard/registered-sessions.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/dashboard/upcoming-exchanges.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/exchanges/exchange-card.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/exchanges/exchange-form.tsx` ? Shared styling and progressive disclosure of optional fields; field names preserved.
+- `components/exchanges/exchange-progress.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/exchanges/exchange-response.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/exchanges/exchange-session-action.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/exchanges/exchange-session-form.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/exchanges/exchange-session-list.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/landing/hero.tsx` ? Clearer hierarchy, whitespace and restrained styling.
+- `components/landing/how-it-works.tsx` ? Clearer hierarchy, whitespace and restrained styling.
+- `components/landing/two-ways.tsx` ? Clearer hierarchy, whitespace and restrained styling.
+- `components/layout/logo.tsx` ? Responsive sizing of the existing logo assets.
+- `components/layout/logout-menu-item.tsx` ? Keyboard-accessible logout form inside the account menu.
+- `components/layout/nav-links.tsx` ? Built routes only, active-page indication and mobile drawer dismissal.
+- `components/layout/sidebar.tsx` ? Consistent navigation spacing, surfaces and touch targets.
+- `components/layout/topbar.tsx` ? Consistent navigation spacing, surfaces and touch targets.
+- `components/notifications/mark-all-read-form.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/notifications/notification-bell.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/notifications/notification-open-form.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/profile/profile-form.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/sessions/my-session-list.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/sessions/registration-panel.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/sessions/session-card.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/sessions/session-filters.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/sessions/session-form.tsx` ? Shared styling and progressive disclosure of optional fields; field names preserved.
+- `components/sessions/session-organizer-action.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/sessions/session-tabs.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/skills/skill-section.tsx` ? Labeled skill selection, large removal controls and wrapping skill names.
+- `components/students/match-card.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/students/student-card.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/students/student-filters.tsx` ? Consistent cards, controls and interaction sizing.
+- `components/ui/button.tsx` ? Shared control sizing, spacing, surfaces and feedback.
+- `components/ui/card.tsx` ? Shared control sizing, spacing, surfaces and feedback.
+- `components/ui/dropdown-menu.tsx` ? Shared control sizing, spacing, surfaces and feedback.
+- `components/ui/input.tsx` ? Shared control sizing, spacing, surfaces and feedback.
+- `components/ui/label.tsx` ? Shared control sizing, spacing, surfaces and feedback.
+- `components/ui/loading-state.tsx` ? Accessible list/form skeletons for asynchronous content.
+- `components/ui/sheet.tsx` ? Shared control sizing, spacing, surfaces and feedback.
+- `components/ui/textarea.tsx` ? Shared control sizing, spacing, surfaces and feedback.
+- `docs/design-system.md` ? Implementation conventions and visual QA checklist for future prompts.
+- `docs/design-change-list.md` ? File-by-file report of this design pass.
+
+Validation: TypeScript, lint, production build, compiled CSS, contrast calculations and rendered-form checks. Live visual checks were unavailable because the browser host and native UI service could not connect.

@@ -16,14 +16,14 @@ export function ExchangeResponse({ exchangeId, canRespond }: { exchangeId: strin
       <input type="hidden" name="exchangeId" value={exchangeId} />
       {canRespond ? (
         <div className="flex flex-wrap gap-2">
-          <Button type="submit" name="action" value="accept" disabled={pending} className="min-h-10">Accept request</Button>
-          <Button type="submit" name="action" value="decline" variant="outline" disabled={pending} className="min-h-10">Decline request</Button>
+          <Button type="submit" name="action" value="accept" disabled={pending} className="min-h-11">Accept request</Button>
+          <Button type="submit" name="action" value="decline" variant="outline" disabled={pending} className="min-h-11">Decline request</Button>
         </div>
       ) : (
         <details className="rounded-xl border p-4">
-          <summary className="flex min-h-10 cursor-pointer items-center text-sm font-medium text-destructive">Cancel exchange</summary>
+          <summary className="flex min-h-11 cursor-pointer items-center text-sm font-medium text-destructive">Cancel exchange</summary>
           <p className="mt-2 text-sm text-muted-foreground">This ends the exchange. To start again, you will need a new request.</p>
-          <Button type="submit" name="action" value="cancel" variant="destructive" disabled={pending} className="mt-3 min-h-10">Yes, cancel exchange</Button>
+          <Button type="submit" name="action" value="cancel" variant="destructive" disabled={pending} className="mt-3 min-h-11">Yes, cancel exchange</Button>
         </details>
       )}
       {pending && <p role="status" className="text-sm text-muted-foreground">Updating exchange...</p>}

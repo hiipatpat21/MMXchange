@@ -1,3 +1,4 @@
+import { LoadingState } from "@/components/ui/loading-state";
 import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
@@ -28,15 +29,15 @@ async function SessionList({ searchParams }: { searchParams: SearchParams }) {
     <h2 className="text-xl font-semibold">Upcoming sessions</h2>
     {result.sessions.length ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{result.sessions.map((session) => <SessionCard key={session.id} session={session} />)}</div> : <div className="space-y-3 rounded-xl border border-dashed bg-card p-6">
       <p className="font-medium">No upcoming sessions match these filters</p><p className="text-sm text-muted-foreground">Try clearing your filters, or share something you know by hosting a session.</p>
-      <div className="flex flex-wrap gap-2"><Button asChild variant="outline" className="min-h-10"><Link href="/sessions">Clear filters</Link></Button><Button asChild className="min-h-10"><Link href="/sessions/new">Host a session</Link></Button></div>
+      <div className="flex flex-wrap gap-2"><Button asChild variant="outline" className="min-h-11"><Link href="/sessions">Clear filters</Link></Button><Button asChild className="min-h-11"><Link href="/sessions/new">Host a session</Link></Button></div>
     </div>}
   </div>;
 }
 
 export default function SessionsPage({ searchParams }: { searchParams: SearchParams }) {
   return <div className="space-y-6">
-    <div className="flex flex-wrap items-center justify-between gap-3"><header><h1 className="text-2xl font-semibold">Group sessions</h1><p className="mt-1 text-muted-foreground">Workshops and tutoring sessions hosted by MMSU students.</p></header><Button asChild className="min-h-10"><Link href="/sessions/new">Host a session</Link></Button></div>
+    <div className="flex flex-wrap items-center justify-between gap-3"><header><h1 className="page-heading">Group sessions</h1><p className="mt-1 text-muted-foreground">Workshops and tutoring sessions hosted by MMSU students.</p></header><Button asChild className="min-h-11"><Link href="/sessions/new">Host a session</Link></Button></div>
     <SessionTabs active="all" />
-    <Suspense fallback={<p role="status">Loading sessions and filters...</p>}><SessionList searchParams={searchParams} /></Suspense>
+    <Suspense fallback={<LoadingState label="Loading sessions and filters..." />}><SessionList searchParams={searchParams} /></Suspense>
   </div>;
 }

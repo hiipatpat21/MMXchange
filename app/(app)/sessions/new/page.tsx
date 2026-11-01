@@ -1,3 +1,4 @@
+import { LoadingState } from "@/components/ui/loading-state";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { SessionForm } from "@/components/sessions/session-form";
@@ -13,12 +14,12 @@ export default function NewSessionPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Host a session</h1>
+        <h1 className="page-heading">Host a session</h1>
         <p className="mt-1 text-muted-foreground">
           Share what you know with other students. Attendees join as learners, so no swap is needed.
         </p>
       </div>
-      <Suspense fallback={<p>Loading...</p>}>
+      <Suspense fallback={<LoadingState label="Loading..." variant="form" />}>
         <FormLoader />
       </Suspense>
     </div>

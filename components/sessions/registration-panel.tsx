@@ -18,7 +18,7 @@ export function RegistrationPanel({
   const [regState, regAction, regPending] = useActionState(registerForSession, null);
   const [cancelState, cancelAction, cancelPending] = useActionState(cancelRegistration, null);
 
-  const box = "space-y-3 rounded-xl border bg-card p-5";
+  const box = "space-y-3 surface-card p-5";
 
   if (panel === "cancelled") {
     return <div className={box}><p className="font-medium">This session was cancelled.</p></div>;
@@ -41,7 +41,7 @@ export function RegistrationPanel({
   if (panel === "registered") {
     return (
       <div className={box}>
-        <p className="font-medium text-primary">You're registered for this session.</p>
+        <p className="font-medium text-primary">You&apos;re registered for this session.</p>
         {canCancel && (
           <form action={cancelAction}>
             <input type="hidden" name="sessionId" value={sessionId} />

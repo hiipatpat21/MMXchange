@@ -1,3 +1,4 @@
+import { LoadingState } from "@/components/ui/loading-state";
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -59,16 +60,16 @@ async function SessionDetail({ params }: { params: Promise<{ id: string }> }) {
           <SessionStatusBadge status={getSessionDisplayStatus(session, registered, now, isRegistered)} />
           {isOrganizer && <Badge variant="outline">Your session</Badge>}
         </div>
-        <h1 className="text-3xl font-bold">{session.title}</h1>
+        <h1 className="page-heading break-words">{session.title}</h1>
         <p className="text-muted-foreground">Hosted by {organizerName ?? "a student"}</p>
       </header>
-      {isOrganizer && session.status === "published" && <Button asChild className="min-h-10"><Link href={`/sessions/${id}/edit`}>Edit session</Link></Button>}
+      {isOrganizer && session.status === "published" && <Button asChild className="min-h-11"><Link href={`/sessions/${id}/edit`}>Edit session</Link></Button>}
 
       {!isOrganizer && (
         <RegistrationPanel sessionId={session.id} panel={panel} canCancel={!started} />
       )}
 
-      <dl className="grid gap-4 rounded-xl border bg-card p-5 sm:grid-cols-2">
+      <dl className="grid gap-4 surface-card p-5 sm:grid-cols-2">
         <div>
           <dt className="text-sm text-muted-foreground">When</dt>
           <dd className="font-medium">{formatDateTime(session.starts_at)}</dd>
@@ -119,7 +120,7 @@ async function SessionDetail({ params }: { params: Promise<{ id: string }> }) {
       )}
 
       {isOrganizer && (
-        <section className="space-y-3 rounded-xl border bg-card p-5">
+        <section className="space-y-3 surface-card p-5">
           <h2 className="text-lg font-semibold">Registered students ({registered})</h2>
           {participantsError ? <p role="alert" className="text-destructive">Could not load the participant list. Please reload to try again.</p> : participants.length === 0 ? (
             <p className="text-sm text-muted-foreground">No one has registered yet.</p>
@@ -148,7 +149,7 @@ async function SessionDetail({ params }: { params: Promise<{ id: string }> }) {
 
 export default function SessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   return (
-    <Suspense fallback={<p>Loading session...</p>}>
+    <Suspense fallback={<LoadingState label="Loading session..." />}>
       <SessionDetail params={params} />
     </Suspense>
   );

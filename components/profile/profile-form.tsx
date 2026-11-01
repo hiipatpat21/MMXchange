@@ -17,7 +17,7 @@ type Profile = {
 };
 
 const selectClass =
-  "h-9 w-full rounded-md border bg-background px-3 text-sm disabled:cursor-not-allowed disabled:opacity-50";
+  "h-11 w-full rounded-xl border border-input bg-card px-3 text-base sm:text-sm disabled:cursor-not-allowed disabled:opacity-50";
 
 export function ProfileForm({ profile }: { profile: Profile }) {
   const [state, formAction, pending] = useActionState(updateProfile, null);
@@ -31,7 +31,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
   const programs = colleges.find((c) => c.name === college)?.programs ?? [];
 
   return (
-    <form action={formAction} className="space-y-4 rounded-xl border bg-card p-6">
+    <form action={formAction} className="space-y-4 surface-card p-6">
       <div className="space-y-2">
         <Label htmlFor="displayName">Display name</Label>
         <Input id="displayName" name="displayName" defaultValue={profile.display_name} required />

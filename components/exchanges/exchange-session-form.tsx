@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-const selectClass = "h-10 w-full min-w-0 rounded-md border bg-background px-3 text-sm focus-visible:outline-2 focus-visible:outline-primary";
+const selectClass = "h-11 w-full min-w-0 rounded-xl border border-input bg-card px-3 text-base sm:text-sm focus-visible:outline-2 focus-visible:outline-primary";
 
 export function ExchangeSessionForm({ exchangeId, teachers, session }: { exchangeId: string; teachers: ExchangeTeacher[]; session?: ExchangeSession }) {
   const [state, action, pending] = useActionState(session ? rescheduleSession : scheduleSession, null);
@@ -55,7 +55,7 @@ export function ExchangeSessionForm({ exchangeId, teachers, session }: { exchang
       <p className="text-sm text-muted-foreground">Changing sessions clears both students&apos; completion confirmations.</p>
       {state?.error && <p role="alert" className="text-sm text-destructive">{state.error}</p>}
       {state?.message && <p role="status" className="text-sm text-primary">{state.message}</p>}
-      <Button type="submit" disabled={pending} className="min-h-10">{pending ? "Saving..." : session ? "Confirm reschedule" : "Schedule session"}</Button>
+      <Button type="submit" disabled={pending} className="min-h-11">{pending ? "Saving..." : session ? "Confirm reschedule" : "Schedule session"}</Button>
     </form>
   );
 }

@@ -1,3 +1,4 @@
+import { LoadingState } from "@/components/ui/loading-state";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 
@@ -25,8 +26,11 @@ async function SkillsList() {
 
 export default function TestSupabasePage() {
   return (
-    <Suspense fallback={<p className="p-6">Loading skills...</p>}>
-      <SkillsList />
-    </Suspense>
+    <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-3xl space-y-6 px-5 py-10 outline-none">
+      <h1 className="page-heading">Connection check</h1>
+      <Suspense fallback={<LoadingState label="Loading skills..." />}>
+        <SkillsList />
+      </Suspense>
+    </main>
   );
 }

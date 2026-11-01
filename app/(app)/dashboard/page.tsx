@@ -17,7 +17,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <h1 className="page-heading">Dashboard</h1>
         <Suspense fallback={<div role="status" aria-label="Loading greeting" className="h-5 w-2/3 animate-pulse rounded bg-muted" />}><DashboardGreeting /></Suspense>
       </header>
       <div className="grid items-start gap-6 lg:grid-cols-2">

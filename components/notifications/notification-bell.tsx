@@ -9,7 +9,7 @@ export function NotificationBell({ unreadCount, notifications, error }: { unread
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative size-10" aria-label={unreadCount === null ? "Notifications, unread count unavailable" : `Notifications, ${unreadCount} unread`}>
+        <Button variant="ghost" size="icon" className="relative size-11" aria-label={unreadCount === null ? "Notifications, unread count unavailable" : `Notifications, ${unreadCount} unread`}>
           <Bell className="size-5" />
           {unreadCount !== null && unreadCount > 0 && <span aria-hidden="true" className="absolute -right-0.5 -top-0.5 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-brand-gold px-1 text-xs font-semibold text-primary">{unreadCount > 9 ? "9+" : unreadCount}</span>}
         </Button>
@@ -19,7 +19,7 @@ export function NotificationBell({ unreadCount, notifications, error }: { unread
         <DropdownMenuSeparator />
         {error ? <p role="alert" className="p-3 text-sm text-destructive">Could not load notifications. Reload to try again.</p> : notifications.length ? notifications.map((item) => <NotificationOpenForm key={item.id} item={item} inMenu />) : <p className="p-3 text-sm text-muted-foreground">You&apos;re all caught up.</p>}
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild><Link href="/notifications" className="min-h-10">View all notifications</Link></DropdownMenuItem>
+        <DropdownMenuItem asChild><Link href="/notifications" className="min-h-11">View all notifications</Link></DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

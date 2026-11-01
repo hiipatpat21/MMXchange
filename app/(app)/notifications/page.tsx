@@ -1,3 +1,4 @@
+import { LoadingState } from "@/components/ui/loading-state";
 import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
@@ -23,15 +24,15 @@ async function NotificationList({ searchParams }: { searchParams: Promise<Record
     <div className="space-y-5">
       <p className="text-sm text-muted-foreground">{unread} unread {unread === 1 ? "notification" : "notifications"}</p>
       {unread > 0 && <MarkAllReadForm />}
-      {items.length ? <ul className="divide-y overflow-hidden rounded-xl border bg-card">{items.slice(0, 30).map((item) => <li key={item.id}><NotificationOpenForm item={item} /></li>)}</ul> : <div className="space-y-3 rounded-xl border border-dashed p-6"><p className="font-medium">{page === 1 ? "You're all caught up" : "No more notifications"}</p><p className="text-sm text-muted-foreground">New exchange requests and session updates will appear here.</p><Button asChild variant="outline" className="min-h-10"><Link href={page === 1 ? "/discover" : "/notifications"}>{page === 1 ? "Discover students" : "Back to first page"}</Link></Button></div>}
+      {items.length ? <ul className="divide-y overflow-hidden surface-card">{items.slice(0, 30).map((item) => <li key={item.id}><NotificationOpenForm item={item} /></li>)}</ul> : <div className="space-y-3 rounded-xl border border-dashed p-6"><p className="font-medium">{page === 1 ? "You're all caught up" : "No more notifications"}</p><p className="text-sm text-muted-foreground">New exchange requests and session updates will appear here.</p><Button asChild variant="outline" className="min-h-11"><Link href={page === 1 ? "/discover" : "/notifications"}>{page === 1 ? "Discover students" : "Back to first page"}</Link></Button></div>}
       <nav aria-label="Notification pages" className="flex flex-wrap gap-2">
-        {page > 1 && <Button asChild variant="outline" className="min-h-10"><Link href={`/notifications?page=${page - 1}`}>Previous</Link></Button>}
-        {items.length > 30 && <Button asChild variant="outline" className="min-h-10"><Link href={`/notifications?page=${page + 1}`}>Next</Link></Button>}
+        {page > 1 && <Button asChild variant="outline" className="min-h-11"><Link href={`/notifications?page=${page - 1}`}>Previous</Link></Button>}
+        {items.length > 30 && <Button asChild variant="outline" className="min-h-11"><Link href={`/notifications?page=${page + 1}`}>Next</Link></Button>}
       </nav>
     </div>
   );
 }
 
 export default function NotificationsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  return <div className="mx-auto max-w-3xl space-y-6"><header><h1 className="text-2xl font-semibold">Notifications</h1><p className="mt-1 text-muted-foreground">Your exchange requests and group-session updates.</p></header><Suspense fallback={<p role="status">Loading notifications...</p>}><NotificationList searchParams={searchParams} /></Suspense></div>;
+  return <div className="mx-auto max-w-3xl space-y-6"><header><h1 className="page-heading">Notifications</h1><p className="mt-1 text-muted-foreground">Your exchange requests and group-session updates.</p></header><Suspense fallback={<LoadingState label="Loading notifications..." />}><NotificationList searchParams={searchParams} /></Suspense></div>;
 }

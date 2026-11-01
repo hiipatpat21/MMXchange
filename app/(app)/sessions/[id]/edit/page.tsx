@@ -1,3 +1,4 @@
+import { LoadingState } from "@/components/ui/loading-state";
 import Link from "next/link";
 import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
@@ -23,5 +24,5 @@ async function EditLoader({ params }: { params: Promise<{ id: string }> }) {
 }
 
 export default function EditSessionPage({ params }: { params: Promise<{ id: string }> }) {
-  return <div className="mx-auto max-w-2xl space-y-6"><h1 className="text-2xl font-semibold">Edit session</h1><Suspense fallback={<p role="status">Loading session editor...</p>}><EditLoader params={params} /></Suspense></div>;
+  return <div className="mx-auto max-w-2xl space-y-6"><h1 className="page-heading">Edit session</h1><Suspense fallback={<LoadingState label="Loading session editor..." variant="form" />}><EditLoader params={params} /></Suspense></div>;
 }

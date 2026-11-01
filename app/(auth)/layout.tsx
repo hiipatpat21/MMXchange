@@ -3,11 +3,12 @@ import { Logo } from "@/components/layout/logo"
 
 export default function AuthLayout({children}: {children: React.ReactNode}) {
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-muted/40 p-4">
-            <Link href="/" aria-label="MMXchange home">
+        <main id="main-content" tabIndex={-1} className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-background px-4 py-10 outline-none sm:py-16">
+            <Link href="/" aria-label="MMXchange home" className="inline-flex min-h-11 items-center rounded-lg">
                 <Logo />
             </Link>
-            <div className="w-full max-w-sm">{children}</div>
-        </div>
+            <div className="w-full max-w-md">{children}</div>
+            <p className="max-w-sm text-center text-xs text-muted-foreground">A student learning community. Not an official university service.</p>
+        </main>
     )
 }

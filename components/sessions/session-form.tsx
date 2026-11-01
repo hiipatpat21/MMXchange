@@ -11,14 +11,14 @@ import { toManilaInput } from "@/lib/datetime";
 
 type Skill = { id: number; name: string };
 
-const selectClass = "h-10 w-full min-w-0 rounded-md border bg-background px-3 text-sm focus-visible:outline-2 focus-visible:outline-primary";
+const selectClass = "h-11 w-full min-w-0 rounded-xl border border-input bg-card px-3 text-base sm:text-sm focus-visible:outline-2 focus-visible:outline-primary";
 
 export function SessionForm({ skills, initialValues, action = createSession }: { skills: Skill[]; initialValues?: GroupSession; action?: (previous: SessionActionState, formData: FormData) => Promise<SessionActionState> }) {
   const [state, formAction, pending] = useActionState(action, null);
   const [format, setFormat] = useState(initialValues?.format ?? "in_person");
 
   return (
-    <form action={formAction} className="space-y-4 rounded-xl border bg-card p-6">
+    <form action={formAction} className="space-y-6 surface-card p-5 sm:p-7">
       {initialValues && <>
         <input type="hidden" name="sessionId" value={initialValues.id} />
         <p className="text-sm text-muted-foreground">Registered students will be notified of important changes to the time, venue, format, or registration deadline.</p>
@@ -43,10 +43,7 @@ export function SessionForm({ skills, initialValues, action = createSession }: {
         <Textarea id="description" name="description" defaultValue={initialValues?.description} rows={4} minLength={10} maxLength={1000} required />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="objectives">What will attendees learn? (optional)</Label>
-        <Textarea id="objectives" name="objectives" defaultValue={initialValues?.objectives ?? ""} rows={3} maxLength={500} />
-      </div>
+
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
@@ -95,20 +92,32 @@ export function SessionForm({ skills, initialValues, action = createSession }: {
         )}
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="deadline">Registration deadline (optional, Philippine time)</Label>
-        <Input id="deadline" name="deadline" defaultValue={initialValues?.registration_deadline ? toManilaInput(initialValues.registration_deadline) : ""} type="datetime-local" />
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="prerequisites">Requirements or things to bring (optional)</Label>
-        <Textarea id="prerequisites" name="prerequisites" defaultValue={initialValues?.prerequisites ?? ""} rows={2} maxLength={500} />
-      </div>
+
+
+
+      <details className="rounded-xl border bg-background/50 p-4">
+        <summary className="text-sm font-medium">Learning goals and registration options <span className="font-normal text-muted-foreground">(optional)</span></summary>
+        <div className="space-y-5 pt-3">
+          <div className="space-y-2">
+            <Label htmlFor="objectives">What will attendees learn? (optional)</Label>
+            <Textarea id="objectives" name="objectives" defaultValue={initialValues?.objectives ?? ""} rows={3} maxLength={500} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="deadline">Registration deadline (optional, Philippine time)</Label>
+            <Input id="deadline" name="deadline" defaultValue={initialValues?.registration_deadline ? toManilaInput(initialValues.registration_deadline) : ""} type="datetime-local" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="prerequisites">Requirements or things to bring (optional)</Label>
+            <Textarea id="prerequisites" name="prerequisites" defaultValue={initialValues?.prerequisites ?? ""} rows={2} maxLength={500} />
+          </div>
+        </div>
+      </details>
 
       {state?.error && (
         <p role="alert" className="text-sm text-destructive">{state.error}</p>
       )}
-      <Button type="submit" disabled={pending} className="min-h-10">
+      <Button type="submit" disabled={pending} className="min-h-11">
         {pending ? "Saving..." : initialValues ? "Save changes" : "Publish session"}
       </Button>
     </form>

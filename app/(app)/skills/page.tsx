@@ -1,3 +1,4 @@
+import { LoadingState } from "@/components/ui/loading-state";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -46,12 +47,12 @@ export default function SkillsPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">My skills</h1>
+        <h1 className="page-heading">My skills</h1>
         <p className="mt-1 text-muted-foreground">
           We use these two lists to suggest students you could swap skills with.
         </p>
       </div>
-      <Suspense fallback={<p>Loading your skills...</p>}>
+      <Suspense fallback={<LoadingState label="Loading your skills..." />}>
         <SkillsLoader />
       </Suspense>
     </div>

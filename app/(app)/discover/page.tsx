@@ -1,3 +1,4 @@
+import { LoadingState } from "@/components/ui/loading-state";
 import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
@@ -29,14 +30,14 @@ async function Recommendations({ supabase, userId }: { supabase: Awaited<ReturnT
       <div className="rounded-xl border border-dashed p-6">
         <p className="font-medium">Add skills to find learning partners</p>
         <p className="mt-1 text-sm text-muted-foreground">Tell us what you can teach and what you want to learn to get recommendations.</p>
-        <Button asChild className="mt-4 min-h-10"><Link href="/skills">Add your skills</Link></Button>
+        <Button asChild className="mt-4 min-h-11"><Link href="/skills">Add your skills</Link></Button>
       </div>
     );
     if (!matches.length) return (
       <div className="rounded-xl border border-dashed p-6">
         <p className="font-medium">No matching students yet</p>
         <p className="mt-1 text-sm text-muted-foreground">Try adding more skills, or explore group sessions for another way to learn.</p>
-        <Button asChild variant="outline" className="mt-4 min-h-10"><Link href="/sessions">Browse group sessions</Link></Button>
+        <Button asChild variant="outline" className="mt-4 min-h-11"><Link href="/sessions">Browse group sessions</Link></Button>
       </div>
     );
     return <div className="grid gap-4 lg:grid-cols-2">{matches.map((match) => <MatchCard key={match.profile.id} match={match} />)}</div>;
@@ -76,7 +77,7 @@ async function BrowseStudents({ supabase, userId, searchParams }: { supabase: Aw
         <div className="rounded-xl border border-dashed p-6">
           <p className="font-medium">No students match these filters</p>
           <p className="mt-1 text-sm text-muted-foreground">Clear your filters or check back as more students join.</p>
-          <Button asChild variant="outline" className="mt-4 min-h-10"><Link href="/discover">Clear filters</Link></Button>
+          <Button asChild variant="outline" className="mt-4 min-h-11"><Link href="/discover">Clear filters</Link></Button>
         </div>
       )}
     </div>
@@ -92,11 +93,11 @@ async function DiscoverContent({ searchParams }: { searchParams: SearchParams })
     <>
       <section className="space-y-4" aria-labelledby="recommended-heading">
         <h2 id="recommended-heading" className="text-xl font-semibold">Recommended for you</h2>
-        <Suspense fallback={<p role="status">Finding learning partners...</p>}><Recommendations supabase={supabase} userId={user.id} /></Suspense>
+        <Suspense fallback={<LoadingState label="Finding learning partners..." />}><Recommendations supabase={supabase} userId={user.id} /></Suspense>
       </section>
       <section className="space-y-4" aria-labelledby="browse-heading">
         <h2 id="browse-heading" className="text-xl font-semibold">Browse students</h2>
-        <Suspense fallback={<p role="status">Loading students and filters...</p>}><BrowseStudents supabase={supabase} userId={user.id} searchParams={searchParams} /></Suspense>
+        <Suspense fallback={<LoadingState label="Loading students and filters..." />}><BrowseStudents supabase={supabase} userId={user.id} searchParams={searchParams} /></Suspense>
       </section>
     </>
   );
@@ -105,8 +106,8 @@ async function DiscoverContent({ searchParams }: { searchParams: SearchParams })
 export default function DiscoverPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="space-y-8">
-      <header><h1 className="text-2xl font-semibold">Discover students</h1><p className="mt-1 text-muted-foreground">Find learning partners through the skills you can share.</p></header>
-      <Suspense fallback={<p role="status">Loading discovery...</p>}><DiscoverContent searchParams={searchParams} /></Suspense>
+      <header><h1 className="page-heading">Discover students</h1><p className="mt-1 text-muted-foreground">Find learning partners through the skills you can share.</p></header>
+      <Suspense fallback={<LoadingState label="Loading discovery..." />}><DiscoverContent searchParams={searchParams} /></Suspense>
     </div>
   );
 }

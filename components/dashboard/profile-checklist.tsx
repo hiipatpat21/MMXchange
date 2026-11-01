@@ -20,7 +20,7 @@ export async function ProfileChecklist() {
   return (
     <DashboardSection title="Complete your profile">
       <p className="text-sm text-muted-foreground">Help other students understand what you want to learn and share.</p>
-      <ul className="space-y-2">{missing.map((item) => <li key={item.label}><Link href={item.href} className="flex min-h-10 items-center gap-3 rounded-lg px-2 text-sm text-primary underline-offset-4 hover:bg-muted hover:underline focus-visible:outline-2 focus-visible:outline-primary"><span aria-hidden="true" className="size-4 shrink-0 rounded border" />{item.label}</Link></li>)}</ul>
+      <ul className="space-y-2">{missing.map((item) => <li key={item.label}><Link href={item.href} className="flex min-h-11 items-center gap-3 rounded-lg px-2 text-sm text-primary underline-offset-4 hover:bg-muted hover:underline focus-visible:outline-2 focus-visible:outline-primary"><span aria-hidden="true" className="size-4 shrink-0 rounded border" />{item.label}</Link></li>)}</ul>
     </DashboardSection>
   );
 }
