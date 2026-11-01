@@ -11,6 +11,9 @@ create policy "Skills are readable by everyone"
   on public.skills for select
   using (true);
 
+grant usage on schema public to anon, authenticated;
+grant select on public.skills to anon, authenticated;
+
 insert into public.skills (name, category) values
   ('Python', 'Programming and technology'),
   ('Web Development', 'Programming and technology'),
