@@ -1,7 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 
 export async function createClient() {
+  await connection();
   const cookieStore = await cookies();
 
   return createServerClient(
@@ -19,11 +21,10 @@ export async function createClient() {
             );
           } catch {
             // Called from a Server Component, where cookies can't be set.
-            // Safe to ignore; we'll handle session refresh separately.
+            // Safe to ignore; the proxy refreshes the session.
           }
         },
       },
     }
   );
 }
-
