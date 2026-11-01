@@ -59,6 +59,9 @@ export function Topbar({ displayName }: { displayName: string }) {
             <Link href="/profile">My Profile</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
+            <Link href="/skills">My Skills</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <form action={logout}>
               <button type="submit" className="w-full text-left">
                 Log out
