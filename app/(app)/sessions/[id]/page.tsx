@@ -21,7 +21,7 @@ async function SessionDetail({ params }: { params: Promise<{ id: string }> }) {
 
   const { data: session } = await supabase
     .from("group_sessions")
-    .select("*, skills(name), profiles!group_sessions_organizer_id_fkey(display_name)")
+      .select("*, skills(name), profiles!group_sessions_organizer_id_fkey(display_name)")
     .eq("id", id)
     .maybeSingle();
   if (!session) notFound();

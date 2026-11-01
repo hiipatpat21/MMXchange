@@ -1,0 +1,46 @@
+import Link from "next/link";
+import { colleges } from "@/lib/mmsu-programs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+export type StudentFilters = { q: string; category: string; skill: string; college: string };
+export type FilterSkill = { id: number; name: string; category: string };
+const selectClass = "h-10 w-full min-w-0 rounded-md border bg-background px-3 text-sm focus-visible:outline-2 focus-visible:outline-primary";
+
+export function StudentFiltersForm({ filters, skills }: { filters: StudentFilters; skills: FilterSkill[] }) {
+  const categories = [...new Set(skills.map((skill) => skill.category))].sort();
+  return (
+    <form action="/discover" method="get" className="grid gap-4 rounded-xl border bg-card p-5 sm:grid-cols-2" key={JSON.stringify(filters)}>
+      <div className="min-w-0 space-y-2">
+        <Label htmlFor="q">Student name</Label>
+        <Input id="q" name="q" defaultValue={filters.q} maxLength={100} placeholder="Search by name" className="h-10" />
+      </div>
+      <div className="min-w-0 space-y-2">
+        <Label htmlFor="category">Teaching category</Label>
+        <select id="category" name="category" defaultValue={filters.category} className={selectClass}>
+          <option value="">All categories</option>
+          {categories.map((category) => <option key={category} value={category}>{category}</option>)}
+        </select>
+      </div>
+      <div className="min-w-0 space-y-2">
+        <Label htmlFor="skill">Skill they can teach</Label>
+        <select id="skill" name="skill" defaultValue={filters.skill} className={selectClass}>
+          <option value="">All skills</option>
+          {skills.map((skill) => <option key={skill.id} value={skill.id}>{skill.name}</option>)}
+        </select>
+      </div>
+      <div className="min-w-0 space-y-2">
+        <Label htmlFor="college">College</Label>
+        <select id="college" name="college" defaultValue={filters.college} className={selectClass}>
+          <option value="">All colleges</option>
+          {colleges.map((college) => <option key={college.name} value={college.name}>{college.name}</option>)}
+        </select>
+      </div>
+      <div className="flex flex-wrap gap-2 sm:col-span-2">
+        <Button type="submit" className="min-h-10">Apply filters</Button>
+        <Button asChild variant="outline" className="min-h-10"><Link href="/discover">Clear filters</Link></Button>
+      </div>
+    </form>
+  );
+}
