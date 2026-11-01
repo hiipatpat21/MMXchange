@@ -16,6 +16,17 @@ async function SessionList() {
 
   if (error) return <p className="text-destructive">Could not load sessions.</p>;
 
+  const ids = (data ?? []).map((row) => row.id);
+  const { data: counts } = await supabase.rpc("registration_counts", {
+    p_session_ids: ids,
+  });
+  const countMap = new Map<string, number>(
+    (counts ?? []).map((c: { session_id: string; registered: number }) => [
+      c.session_id,
+      Number(c.registered),
+    ])
+  );
+
   const sessions: SessionCardData[] = (data ?? []).map((row) => ({
     id: row.id,
     title: row.title,
@@ -24,6 +35,7 @@ async function SessionList() {
     capacity: row.capacity,
     skillName: pickOne<{ name: string }>(row.skills)?.name ?? null,
     organizerName: pickOne<{ display_name: string }>(row.profiles)?.display_name ?? null,
+    registered: countMap.get(row.id) ?? 0,
   }));
 
   if (sessions.length === 0) {
