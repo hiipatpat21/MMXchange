@@ -4,180 +4,125 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { parseManilaInput } from "@/lib/datetime";
+import { sessionSchema, readSessionForm } from "@/lib/session-validation";
+import { getRegistrationCounts, type SessionActionState } from "@/lib/group-sessions";
 
-type SessionFormState = { error?: string } | null;
-
-const sessionSchema = z.object({
-  title: z.string().trim().min(3, "Title must be at least 3 characters.").max(100, "Title must be 100 characters or fewer."),
-  skillId: z.coerce.number().int().positive("Choose a skill or topic."),
-  description: z.string().trim().min(10, "Description must be at least 10 characters.").max(1000, "Description must be 1000 characters or fewer."),
-  objectives: z.string().trim().max(500, "Learning objectives must be 500 characters or fewer."),
-  prerequisites: z.string().trim().max(500, "Requirements must be 500 characters or fewer."),
-  startsAt: z.string(),
-  durationMinutes: z.coerce.number().int().min(15, "Duration is too short.").max(480, "Duration is too long."),
-  format: z.enum(["in_person", "online"], { message: "Choose a format." }),
-  venue: z.string().trim().min(2, "Enter a venue or meeting details.").max(200, "Venue must be 200 characters or fewer."),
-  capacity: z.string(),
-  deadline: z.string(),
-});
-
-export async function createSession(
-  _prev: SessionFormState,
-  formData: FormData
-): Promise<SessionFormState> {
-  const text = (name: string) => String(formData.get(name) ?? "");
-
-  const parsed = sessionSchema.safeParse({
-    title: text("title"),
-    skillId: text("skillId"),
-    description: text("description"),
-    objectives: text("objectives"),
-    prerequisites: text("prerequisites"),
-    startsAt: text("startsAt"),
-    durationMinutes: text("durationMinutes"),
-    format: text("format"),
-    venue: text("venue"),
-    capacity: text("capacity"),
-    deadline: text("deadline"),
-  });
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
-  const d = parsed.data;
-
-  const startsAt = parseManilaInput(d.startsAt);
-  if (!startsAt) return { error: "Choose a valid date and start time." };
-  if (startsAt.getTime() <= Date.now()) {
-    return { error: "The session must start in the future." };
+function refreshSessions(id?: string) {
+  for (const path of ["/sessions", "/sessions/registered", "/sessions/organized"]) revalidatePath(path);
+  if (id) {
+    revalidatePath(`/sessions/${id}`);
+    revalidatePath(`/sessions/${id}/edit`);
   }
-
-  let deadline: Date | null = null;
-  if (d.deadline) {
-    deadline = parseManilaInput(d.deadline);
-    if (!deadline) return { error: "Choose a valid registration deadline." };
-    if (deadline.getTime() > startsAt.getTime()) {
-      return { error: "The registration deadline must be before the session starts." };
-    }
-  }
-
-  let capacity: number | null = null;
-  if (d.capacity !== "") {
-    capacity = Number(d.capacity);
-    if (!Number.isInteger(capacity) || capacity < 1 || capacity > 500) {
-      return { error: "Capacity must be a whole number from 1 to 500." };
-    }
-  }
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "You need to be logged in." };
-
-  const { data, error } = await supabase
-    .from("group_sessions")
-    .insert({
-      organizer_id: user.id,
-      skill_id: d.skillId,
-      title: d.title,
-      description: d.description,
-      objectives: d.objectives || null,
-      prerequisites: d.prerequisites || null,
-      starts_at: startsAt.toISOString(),
-      duration_minutes: d.durationMinutes,
-      format: d.format,
-      venue: d.venue,
-      capacity,
-      registration_deadline: deadline ? deadline.toISOString() : null,
-    })
-    .select("id")
-    .single();
-
-  if (error || !data) return { error: "Could not create the session. Please try again." };
-
-  revalidatePath("/sessions");
-  redirect(`/sessions/${data.id}`);
-
 }
-
-type ActionState = { error?: string; message?: string } | null;
 
 const rejectionMessages: Record<string, string> = {
   not_logged_in: "You need to be logged in.",
   not_found: "This session no longer exists.",
-  not_open: "This session is not open for registration.",
-  is_organizer: "You're the organizer of this session.",
+  not_open: "This session is no longer published. Reload to see its status.",
+  not_organizer: "Only the organizer can change this session.",
+  is_organizer: "You are the organizer of this session.",
   closed: "Registration is closed for this session.",
-  already_registered: "You're already registered.",
+  already_registered: "You are already registered.",
   full: "Sorry, this session is full.",
+  too_early: "You can complete the session after its start time.",
+  capacity_too_low: "The participant limit cannot be below the number already registered.",
+  past_date: "Choose a future start time in Philippine time.",
+  invalid_input: "Check the session details and try again.",
+  invalid_skill: "Choose an available skill or topic.",
 };
 
-export async function registerForSession(
-  _prev: ActionState,
-  formData: FormData
-): Promise<ActionState> {
-  const id = z.string().uuid().safeParse(formData.get("sessionId"));
-  if (!id.success) return { error: "Invalid session." };
-
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("register_for_session", {
-    p_session_id: id.data,
-  });
-  if (error) return { error: "Could not register. Please try again." };
-
-  revalidatePath(`/sessions/${id.data}`);
-  revalidatePath("/sessions");
-
-  if (data === "ok") return { message: "You're registered!" };
-  return { error: rejectionMessages[data as string] ?? "Could not register." };
+function mutationResult(data: unknown, error: { message: string } | null, id: string): SessionActionState {
+  if (error) return { error: "Could not update the session. Please try again." };
+  refreshSessions(id);
+  return data === "ok" ? { message: "Session updated." } : { error: rejectionMessages[String(data)] ?? "Could not update the session." };
 }
 
-export async function cancelRegistration(
-  _prev: ActionState,
-  formData: FormData
-): Promise<ActionState> {
+export async function createSession(_previous: SessionActionState, formData: FormData): Promise<SessionActionState> {
+  const parsed = sessionSchema.safeParse(readSessionForm(formData));
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  const d = parsed.data;
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return { error: "You need to be logged in." };
+  const { data, error } = await supabase.from("group_sessions").insert({
+    organizer_id: user.id, skill_id: d.skillId, title: d.title, description: d.description,
+    objectives: d.objectives || null, prerequisites: d.prerequisites || null, starts_at: d.startsAt,
+    duration_minutes: d.durationMinutes, format: d.format, venue: d.venue,
+    capacity: d.capacity, registration_deadline: d.deadline,
+  }).select("id").single();
+  if (error || !data) return { error: "Could not create the session. Please try again." };
+  refreshSessions(data.id);
+  redirect(`/sessions/${data.id}`);
+}
+
+export async function updateSession(_previous: SessionActionState, formData: FormData): Promise<SessionActionState> {
+  const parsed = sessionSchema.safeParse(readSessionForm(formData));
   const id = z.string().uuid().safeParse(formData.get("sessionId"));
   if (!id.success) return { error: "Invalid session." };
-
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "You need to be logged in." };
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return { error: "You need to be logged in." };
+  const { data: current, error: readError } = await supabase.from("group_sessions").select("id, status").eq("id", id.data).eq("organizer_id", user.id).maybeSingle();
+  if (readError) return { error: "Could not load the session. Please try again." };
+  if (!current) return { error: rejectionMessages.not_organizer };
+  if (current.status !== "published") return { error: rejectionMessages.not_open };
+  const d = parsed.data;
+  let counts: Map<string, number>;
+  try { counts = await getRegistrationCounts(supabase, [id.data]); }
+  catch { return { error: "Could not check the registered count. Please try again." }; }
+  if (d.capacity !== null && d.capacity < (counts.get(id.data) ?? 0)) return { error: rejectionMessages.capacity_too_low };
+  // The function repeats the count while holding the registration lock.
+  const { data, error } = await supabase.rpc("update_group_session", {
+    p_session_id: id.data, p_title: d.title, p_skill_id: d.skillId, p_description: d.description,
+    p_objectives: d.objectives || null, p_prerequisites: d.prerequisites || null,
+    p_starts_at: d.startsAt, p_duration_minutes: d.durationMinutes, p_format: d.format,
+    p_venue: d.venue, p_capacity: d.capacity, p_registration_deadline: d.deadline,
+  });
+  const result = mutationResult(data, error, id.data);
+  if (result?.error) return result;
+  redirect(`/sessions/${id.data}`);
+}
 
-  const { data, error } = await supabase
-    .from("group_session_registrations")
-    .delete()
-    .eq("session_id", id.data)
-    .eq("profile_id", user.id)
-    .select("session_id");
+export async function registerForSession(_previous: SessionActionState, formData: FormData): Promise<SessionActionState> {
+  const id = z.string().uuid().safeParse(formData.get("sessionId"));
+  if (!id.success) return { error: "Invalid session." };
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return { error: "You need to be logged in." };
+  const { data, error } = await supabase.rpc("register_for_session", { p_session_id: id.data });
+  const result = mutationResult(data, error, id.data);
+  return result?.error ? result : { message: "You are registered!" };
+}
 
-  if (error || !data || data.length === 0) {
-    return { error: "Could not cancel. The session may have already started." };
-  }
-
-  revalidatePath(`/sessions/${id.data}`);
-  revalidatePath("/sessions");
+export async function cancelRegistration(_previous: SessionActionState, formData: FormData): Promise<SessionActionState> {
+  const id = z.string().uuid().safeParse(formData.get("sessionId"));
+  if (!id.success) return { error: "Invalid session." };
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return { error: "You need to be logged in." };
+  const { data, error } = await supabase.from("group_session_registrations").delete().eq("session_id", id.data).eq("profile_id", user.id).select("session_id");
+  if (error || !data?.length) return { error: "Could not cancel. The session may have already started." };
+  refreshSessions(id.data);
   return { message: "Registration cancelled." };
 }
 
-export async function cancelSession(formData: FormData) {
+export async function cancelSession(_previous: SessionActionState, formData: FormData): Promise<SessionActionState> {
   const id = z.string().uuid().safeParse(formData.get("sessionId"));
-  if (!id.success) return;
-
+  if (!id.success) return { error: "Invalid session." };
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return;
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return { error: "You need to be logged in." };
+  const { data, error } = await supabase.rpc("cancel_group_session", { p_session_id: id.data });
+  return mutationResult(data, error, id.data);
+}
 
-  const { error } = await supabase
-    .from("group_sessions")
-    .update({ status: "cancelled" })
-    .eq("id", id.data)
-    .eq("organizer_id", user.id)
-    .eq("status", "published");
-  if (error) console.error("cancelSession failed:", error.message);
-
-  revalidatePath(`/sessions/${id.data}`);
-  revalidatePath("/sessions");
+export async function completeSession(_previous: SessionActionState, formData: FormData): Promise<SessionActionState> {
+  const id = z.string().uuid().safeParse(formData.get("sessionId"));
+  if (!id.success) return { error: "Invalid session." };
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return { error: "You need to be logged in." };
+  const { data, error } = await supabase.rpc("complete_group_session", { p_session_id: id.data });
+  return mutationResult(data, error, id.data);
 }

@@ -4,7 +4,8 @@ import { SessionForm } from "@/components/sessions/session-form";
 
 async function FormLoader() {
   const supabase = await createClient();
-  const { data: skills } = await supabase.from("skills").select("id, name").order("name");
+  const { data: skills, error } = await supabase.from("skills").select("id, name").order("name");
+  if (error) return <p role="alert" className="text-destructive">Could not load skill options. Please reload to try again.</p>;
   return <SessionForm skills={skills ?? []} />;
 }
 

@@ -32,3 +32,29 @@ export function exchangePerspective(exchange: ExchangeRow, userId: string) {
 }
 
 export const exchangeFormats = { in_person: "In person", online: "Online", either: "Either in person or online" };
+
+export type ExchangeDetail = ExchangeRow & {
+  teach_skill_id: number;
+  learn_skill_id: number;
+  message: string;
+  format: keyof typeof exchangeFormats;
+  availability: string | null;
+  notes: string | null;
+  requester_completed_at: string | null;
+  recipient_completed_at: string | null;
+};
+
+export type ExchangeSession = {
+  id: string;
+  exchange_id: string;
+  teacher_id: string;
+  skill_id: number;
+  starts_at: string;
+  duration_minutes: number;
+  format: "in_person" | "online";
+  venue: string;
+  notes: string | null;
+  status: "scheduled" | "cancelled" | "completed";
+};
+
+export type ExchangeTeacher = { id: string; name: string; skillName: string };
