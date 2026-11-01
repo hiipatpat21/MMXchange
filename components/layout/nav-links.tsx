@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { Suspense } from "react"
 import { usePathname } from "next/navigation"
 import {
     LayoutDashboard,
@@ -24,13 +25,23 @@ const links = [
 ];
 
 export function NavLinks () {
-    const pathname = usePathname()
-    // if the user is at localhost:3000/sessions, pathname is "/sessions"
+    return (
+        <Suspense fallback={<NavigationLinks pathname={null} />}>
+            <ActiveNavLinks />
+        </Suspense>
+    )
+}
 
+function ActiveNavLinks () {
+    const pathname = usePathname()
+    return <NavigationLinks pathname={pathname} />
+}
+
+function NavigationLinks ({ pathname }: { pathname: string | null }) {
     return (
         <nav className="flex flex-col gap-1">
             {links.map(({ href, label, icon: Icon}) => {
-                const active = pathname === href || pathname.startsWith(href + "/");
+                const active = pathname === href || pathname?.startsWith(href + "/");
                 return (
                     <Link
                         key={href}
