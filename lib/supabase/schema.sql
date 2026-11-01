@@ -75,3 +75,35 @@ $$;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+
+--pick skills
+create table public.profile_skills (
+  profile_id uuid not null references public.profiles (id) on delete cascade,
+  skill_id bigint not null references public.skills (id) on delete cascade,
+  kind text not null check (kind in ('teach', 'learn')),
+  created_at timestamptz not null default now(),
+  primary key (profile_id, skill_id)
+);
+
+create index profile_skills_skill_kind_idx
+  on public.profile_skills (skill_id, kind);
+
+alter table public.profile_skills enable row level security;
+
+create policy "Logged-in students can view all profile skills"
+  on public.profile_skills for select
+  to authenticated
+  using (true);
+
+create policy "Students can add their own skills"
+  on public.profile_skills for insert
+  to authenticated
+  with check (profile_id = (select auth.uid()));
+
+create policy "Students can remove their own skills"
+  on public.profile_skills for delete
+  to authenticated
+  using (profile_id = (select auth.uid()));
+
+grant select, insert, delete on public.profile_skills to authenticated;
