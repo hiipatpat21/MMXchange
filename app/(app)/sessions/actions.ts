@@ -96,4 +96,88 @@ export async function createSession(
 
   revalidatePath("/sessions");
   redirect(`/sessions/${data.id}`);
+
+}
+
+type ActionState = { error?: string; message?: string } | null;
+
+const rejectionMessages: Record<string, string> = {
+  not_logged_in: "You need to be logged in.",
+  not_found: "This session no longer exists.",
+  not_open: "This session is not open for registration.",
+  is_organizer: "You're the organizer of this session.",
+  closed: "Registration is closed for this session.",
+  already_registered: "You're already registered.",
+  full: "Sorry, this session is full.",
+};
+
+export async function registerForSession(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const id = z.string().uuid().safeParse(formData.get("sessionId"));
+  if (!id.success) return { error: "Invalid session." };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("register_for_session", {
+    p_session_id: id.data,
+  });
+  if (error) return { error: "Could not register. Please try again." };
+
+  revalidatePath(`/sessions/${id.data}`);
+  revalidatePath("/sessions");
+
+  if (data === "ok") return { message: "You're registered!" };
+  return { error: rejectionMessages[data as string] ?? "Could not register." };
+}
+
+export async function cancelRegistration(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const id = z.string().uuid().safeParse(formData.get("sessionId"));
+  if (!id.success) return { error: "Invalid session." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "You need to be logged in." };
+
+  const { data, error } = await supabase
+    .from("group_session_registrations")
+    .delete()
+    .eq("session_id", id.data)
+    .eq("profile_id", user.id)
+    .select("session_id");
+
+  if (error || !data || data.length === 0) {
+    return { error: "Could not cancel. The session may have already started." };
+  }
+
+  revalidatePath(`/sessions/${id.data}`);
+  revalidatePath("/sessions");
+  return { message: "Registration cancelled." };
+}
+
+export async function cancelSession(formData: FormData) {
+  const id = z.string().uuid().safeParse(formData.get("sessionId"));
+  if (!id.success) return;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const { error } = await supabase
+    .from("group_sessions")
+    .update({ status: "cancelled" })
+    .eq("id", id.data)
+    .eq("organizer_id", user.id)
+    .eq("status", "published");
+  if (error) console.error("cancelSession failed:", error.message);
+
+  revalidatePath(`/sessions/${id.data}`);
+  revalidatePath("/sessions");
 }
