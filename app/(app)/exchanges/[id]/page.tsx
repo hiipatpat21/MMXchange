@@ -1,4 +1,6 @@
 import { LoadingState } from "@/components/ui/loading-state";
+import { Button } from "@/components/ui/button";
+import { canMessage } from "@/lib/messages";
 import Link from "next/link";
 import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
@@ -46,6 +48,7 @@ async function ExchangeDetail({ params }: { params: Promise<{ id: string }> }) {
         <h1 className="break-words page-heading">Exchange with {view.otherName}</h1>
         <p className="text-sm text-muted-foreground">Requested {formatDateTime(exchange.created_at)}</p>
       </header>
+      {canMessage(exchange.status) && <Button asChild variant="outline"><Link href={`/messages/${id}`} className="max-w-full whitespace-normal break-words">Message {view.otherName}</Link></Button>}
       {progress && <ExchangeProgress currentStep={progress.currentStep} nextAction={progress.nextAction} status={exchange.status} />}
       <section className="space-y-4 surface-card p-5">
         <h2 className="text-lg font-semibold">Exchange summary</h2>

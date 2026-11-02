@@ -3,16 +3,17 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Compass, CalendarDays, ArrowLeftRight, Bell } from "lucide-react";
+import { LayoutDashboard, Compass, CalendarDays, ArrowLeftRight, Bell, MessageCircle } from "lucide-react";
 import { SheetClose } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
-// Add Messages and Forum when those routes are implemented.
+// Add Forum when that route is implemented.
 const links = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/discover", label: "Discover", icon: Compass },
   { href: "/sessions", label: "Group sessions", icon: CalendarDays },
   { href: "/exchanges", label: "Exchanges", icon: ArrowLeftRight },
+  { href: "/messages", label: "Messages", icon: MessageCircle },
   { href: "/notifications", label: "Notifications", icon: Bell },
 ];
 

@@ -1,4 +1,5 @@
 import { LoadingState } from "@/components/ui/loading-state";
+import { Announcements } from "@/components/sessions/announcements";
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -14,9 +15,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RegistrationPanel, type PanelKind } from "@/components/sessions/registration-panel";
 
-async function SessionDetail({ params }: { params: Promise<{ id: string }> }) {
+type PageProps = { params: Promise<{ id: string }>; searchParams: Promise<{ announcementBefore?: string; announcementBeforeId?: string }> };
+
+async function SessionDetail({ params, searchParams }: PageProps) {
   const { id } = await params;
   if (!z.string().uuid().safeParse(id).success) notFound();
+  const query = await searchParams;
+  const cursor = z.object({ announcementBefore: z.iso.datetime({ offset: true }), announcementBeforeId: z.string().uuid() }).safeParse(query);
+  if ((query.announcementBefore || query.announcementBeforeId) && !cursor.success) notFound();
 
   const supabase = await createClient();
   const {
@@ -137,6 +143,8 @@ async function SessionDetail({ params }: { params: Promise<{ id: string }> }) {
         </section>
       )}
 
+      {(isOrganizer || isRegistered) && <Suspense fallback={<LoadingState label="Loading announcements…" />}><Announcements sessionId={id} organizer={isOrganizer} published={session.status === "published"} before={cursor.success ? cursor.data.announcementBefore : undefined} beforeId={cursor.success ? cursor.data.announcementBeforeId : undefined} /></Suspense>}
+
       {isOrganizer && session.status === "published" && (
         <div className="space-y-4">
           {started && <SessionOrganizerAction sessionId={id} type="complete" />}
@@ -147,10 +155,10 @@ async function SessionDetail({ params }: { params: Promise<{ id: string }> }) {
   );
 }
 
-export default function SessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function SessionDetailPage(props: PageProps) {
   return (
     <Suspense fallback={<LoadingState label="Loading session..." />}>
-      <SessionDetail params={params} />
+      <SessionDetail {...props} />
     </Suspense>
   );
 }
