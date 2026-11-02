@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { StudentAvatar } from "@/components/students/student-avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,16 +17,7 @@ import { LogoutMenuItem } from "@/components/layout/logout-menu-item";
 import type { NotificationItem } from "@/lib/notifications";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0].toUpperCase())
-    .join("");
-}
-
-export function Topbar({ displayName, profileError, unreadCount, notifications, notificationsError }: { displayName: string; profileError: boolean; unreadCount: number | null; notifications: NotificationItem[]; notificationsError: boolean }) {
+export function Topbar({ displayName, avatarUrl, profileError, unreadCount, notifications, notificationsError }: { displayName: string; avatarUrl: string | null; profileError: boolean; unreadCount: number | null; notifications: NotificationItem[]; notificationsError: boolean }) {
   return (
     <header className="sticky top-0 z-30 flex h-18 shrink-0 items-center justify-between gap-3 border-b bg-card px-4 sm:px-6 lg:px-10">
       <div className="flex min-w-0 items-center gap-2">
@@ -52,9 +43,7 @@ export function Topbar({ displayName, profileError, unreadCount, notifications, 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="size-11 rounded-full p-0" aria-label="Account menu">
-            <Avatar>
-              <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
-            </Avatar>
+            <StudentAvatar name={displayName} url={avatarUrl} className="size-10" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

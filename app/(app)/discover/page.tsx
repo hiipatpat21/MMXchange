@@ -55,8 +55,8 @@ async function BrowseStudents({ supabase, userId, searchParams }: { supabase: Aw
   // Both skill filters apply to that same teaching row.
   const teachingFilter = !!(filters.category || filters.skill);
   let query = (teachingFilter
-    ? supabase.from("profiles").select("id, display_name, college, program, year_level, bio, created_at, profile_skills!inner(skill_id, kind, skills!inner(category))")
-    : supabase.from("profiles").select("id, display_name, college, program, year_level, bio, created_at")
+    ? supabase.from("profiles").select("id, display_name, college, program, year_level, bio, avatar_url, created_at, profile_skills!inner(skill_id, kind, skills!inner(category))")
+    : supabase.from("profiles").select("id, display_name, college, program, year_level, bio, avatar_url, created_at")
   ).neq("id", userId);
   if (filters.q) query = query.ilike("display_name", `%${filters.q.replace(/[\\%_]/g, "\\$&")}%`);
   if (filters.college) query = query.eq("college", filters.college);

@@ -12,6 +12,7 @@ export type StudentProfile = {
   program: string | null;
   year_level: number | null;
   bio: string | null;
+  avatar_url: string | null;
   created_at: string;
 };
 
@@ -26,7 +27,7 @@ export type StudentMatch = {
   explanation: string;
 };
 
-const profileColumns = "id, display_name, college, program, year_level, bio, created_at";
+const profileColumns = "id, display_name, college, program, year_level, bio, avatar_url, created_at";
 
 function skillNames(skills: MatchSkill[]): string {
   const names = skills.map((skill) => skill.name);

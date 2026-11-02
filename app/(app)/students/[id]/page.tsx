@@ -16,7 +16,7 @@ async function StudentProfile({ params }: { params: Promise<{ id: string }> }) {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError) return <p role="alert" className="text-destructive">Could not verify your account. Please sign in again.</p>;
   if (!user) redirect("/login");
-  const { data: profile, error } = await supabase.from("profiles").select("id, display_name, college, program, year_level, bio").eq("id", id).maybeSingle();
+  const { data: profile, error } = await supabase.from("profiles").select("id, display_name, college, program, year_level, bio, avatar_url").eq("id", id).maybeSingle();
   if (error) return <p role="alert" className="text-destructive">Could not load this profile. Please reload to try again.</p>;
   if (!profile) notFound();
   const { data: rows, error: skillsError } = await supabase.from("profile_skills").select("skill_id, kind, skills(name)").eq("profile_id", id).order("skill_id");

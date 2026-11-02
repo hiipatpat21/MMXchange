@@ -3,6 +3,9 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
+import { emailDomainAllowed } from "@/lib/auth-redirects";
+import { recoveryCookieName } from "@/lib/recovery";
 
 type AuthState = { error?: string; message?: string } | null;
 
@@ -27,7 +30,7 @@ export async function login(_prev: AuthState, formData: FormData): Promise<AuthS
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) return { error: "Incorrect email or password." };
-
+  (await cookies()).delete(recoveryCookieName);
   redirect("/dashboard");
 }
 
@@ -38,6 +41,10 @@ export async function register(_prev: AuthState, formData: FormData): Promise<Au
     password: formData.get("password"),
   });
   if (!parsed.success) return { error: parsed.error.issues[0].message };
+
+  if (!emailDomainAllowed(parsed.data.email, process.env.ALLOWED_EMAIL_DOMAINS)) {
+    return { error: "Please use an email address from a domain allowed by this project." };
+  }
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
@@ -56,5 +63,6 @@ export async function register(_prev: AuthState, formData: FormData): Promise<Au
 export async function logout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
+  (await cookies()).delete(recoveryCookieName);
   redirect("/login");
 }

@@ -13,6 +13,7 @@ export default function RegisterPage() {
             </CardHeader>
             <CardContent className="space-y-4">
                 <RegisterForm />
+                <p className="text-sm text-muted-foreground">An account does not mean you are officially verified as an MMSU student.</p>
                 <p className="text-center text-sm text-muted-foreground">
                     Already have an account?{" "}
                     <Link href="/login" className="inline-flex min-h-11 items-center font-medium text-primary hover:underline">

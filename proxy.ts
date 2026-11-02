@@ -13,7 +13,8 @@ const protectedPaths = [
   "/profile",
   "/skills"
 ];
-const authPaths = ["/login", "/register"];
+// Recovery callback and reset screen must remain reachable with a new session.
+const authPaths = ["/login", "/register", "/forgot-password"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });

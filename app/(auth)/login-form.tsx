@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { login } from "@/app/(auth)/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,7 @@ export function LoginForm() {
         <Label htmlFor="password">Password</Label>
         <Input id="password" name="password" type="password" autoComplete="current-password" required />
       </div>
+      <Link href="/forgot-password" className="inline-flex min-h-11 items-center text-sm font-medium text-primary underline">Forgot password?</Link>
       {state?.error && (
         <p role="alert" className="text-sm text-destructive">{state.error}</p>
       )}
