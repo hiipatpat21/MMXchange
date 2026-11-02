@@ -52,7 +52,7 @@ export async function register(_prev: AuthState, formData: FormData): Promise<Au
     password: parsed.data.password,
     options: { data: { display_name: parsed.data.displayName } },
   });
-  if (error) return { error: error.message };
+  if (error) return { error: "Could not create your account. Please check your details and try again later." };
 
   // If email confirmation is on, there is no session yet.
   if (!data.session) return { message: "Check your email to confirm your account." };
