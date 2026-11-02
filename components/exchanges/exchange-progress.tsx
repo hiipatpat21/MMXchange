@@ -9,13 +9,12 @@ export function ExchangeProgress({ currentStep, nextAction, status }: { currentS
       <h2 id="progress-heading" className="text-lg font-semibold">Exchange progress</h2>
       <ol className="grid gap-3 md:grid-cols-6">
         {steps.map((step, index) => {
-          const locked = index === 5;
           const current = index === currentStep && !ended;
-          const reached = index <= currentStep && !locked;
+          const reached = index <= currentStep;
           return (
             <li key={step} aria-current={current ? "step" : undefined} className={`flex items-center gap-2 rounded-lg p-2 text-sm md:flex-col md:items-start ${current ? "bg-primary/10 font-semibold text-primary" : reached ? "text-foreground" : "text-muted-foreground"}`}>
-              <span aria-hidden="true" className={`flex size-7 shrink-0 items-center justify-center rounded-full border text-xs ${current ? "border-primary bg-primary text-primary-foreground" : "border-current"}`}>{index < currentStep ? "✓" : index + 1}</span>
-              <span>{step}{locked && <span className="block text-xs font-normal">Upcoming · locked</span>}</span>
+              <span aria-hidden="true" className={`flex size-7 shrink-0 items-center justify-center rounded-full border text-xs ${current ? "border-primary bg-primary text-primary-foreground" : "border-current"}`}>{index < currentStep || currentStep === 5 ? "✓" : index + 1}</span>
+              <span>{step}</span>
             </li>
           );
         })}

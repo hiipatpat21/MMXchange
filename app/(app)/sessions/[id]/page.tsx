@@ -1,5 +1,6 @@
 import { LoadingState } from "@/components/ui/loading-state";
 import { Announcements } from "@/components/sessions/announcements";
+import { SessionFeedback } from "@/components/feedback/session-feedback";
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -144,6 +145,7 @@ async function SessionDetail({ params, searchParams }: PageProps) {
       )}
 
       {(isOrganizer || isRegistered) && <Suspense fallback={<LoadingState label="Loading announcements…" />}><Announcements sessionId={id} organizer={isOrganizer} published={session.status === "published"} before={cursor.success ? cursor.data.announcementBefore : undefined} beforeId={cursor.success ? cursor.data.announcementBeforeId : undefined} /></Suspense>}
+      {session.status === "completed" && <Suspense fallback={<LoadingState label="Loading session feedback…" />}><SessionFeedback sessionId={id} userId={user.id} eligible={isRegistered && !isOrganizer} /></Suspense>}
 
       {isOrganizer && session.status === "published" && (
         <div className="space-y-4">

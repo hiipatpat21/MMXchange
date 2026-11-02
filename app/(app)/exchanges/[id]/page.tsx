@@ -1,6 +1,7 @@
 import { LoadingState } from "@/components/ui/loading-state";
 import { Button } from "@/components/ui/button";
 import { canMessage } from "@/lib/messages";
+import { ExchangeFeedback } from "@/components/feedback/exchange-feedback";
 import Link from "next/link";
 import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
@@ -36,7 +37,12 @@ async function ExchangeDetail({ params }: { params: Promise<{ id: string }> }) {
   const editable = exchange.status === "accepted" || exchange.status === "scheduled";
   const canCancel = (isRequester && exchange.status === "pending") || editable;
   const { sessions, error: sessionsError, now } = await loadExchangeSessions(supabase, id);
-  const progress = sessionsError ? null : getExchangeProgress(exchange, sessions, user.id, view.otherName, now);
+  let feedbackSubmitted: boolean | null = false;
+  if (exchange.status === "completed") {
+    const review = await supabase.from("exchange_reviews").select("id").eq("exchange_id", id).eq("reviewer_id", user.id).maybeSingle();
+    feedbackSubmitted = review.error ? null : !!review.data;
+  }
+  const progress = sessionsError ? null : getExchangeProgress(exchange, sessions, user.id, view.otherName, now, feedbackSubmitted);
   const teachers = [
     { id: exchange.requester_id, name: pickOne(exchange.requester)?.display_name ?? "Student", skillName: pickOne(exchange.teach_skill)?.name ?? "Unknown skill" },
     { id: exchange.recipient_id, name: pickOne(exchange.recipient)?.display_name ?? "Student", skillName: pickOne(exchange.learn_skill)?.name ?? "Unknown skill" },
@@ -85,6 +91,7 @@ async function ExchangeDetail({ params }: { params: Promise<{ id: string }> }) {
         {progress?.canComplete && <ExchangeSessionAction id={id} type="complete" />}
       </section>}
       {(canRespond || canCancel) && <ExchangeResponse exchangeId={id} canRespond={canRespond} />}
+      {exchange.status === "completed" && <Suspense fallback={<LoadingState label="Loading feedback…" />}><ExchangeFeedback exchangeId={id} submitted={feedbackSubmitted} /></Suspense>}
       <Link href="/exchanges" className="inline-flex min-h-11 items-center text-sm text-primary underline">Back to exchanges</Link>
     </article>
   );

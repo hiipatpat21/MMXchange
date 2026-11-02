@@ -743,3 +743,120 @@ language sql stable security invoker set search_path = '' as $$
 $$;
 revoke execute on function public.list_exchange_conversations(integer) from public, anon;
 grant execute on function public.list_exchange_conversations(integer) to authenticated;
+
+-- Prompt 9: separate exchange reviews, group feedback, and private reports.
+create table if not exists public.exchange_reviews (
+  id uuid primary key default gen_random_uuid(),
+  exchange_id uuid not null references public.exchange_requests(id) on delete cascade,
+  reviewer_id uuid not null references public.profiles(id) on delete cascade,
+  reviewee_id uuid not null references public.profiles(id) on delete cascade,
+  rating smallint not null check (rating between 1 and 5),
+  comment text check (char_length(comment) <= 500),
+  created_at timestamptz not null default now(),
+  unique (exchange_id, reviewer_id),
+  check (reviewer_id <> reviewee_id)
+);
+create table if not exists public.group_session_feedback (
+  session_id uuid not null references public.group_sessions(id) on delete cascade,
+  profile_id uuid not null references public.profiles(id) on delete cascade,
+  rating smallint not null check (rating between 1 and 5),
+  helpful boolean not null,
+  comment text check (char_length(comment) <= 500),
+  created_at timestamptz not null default now(),
+  primary key (session_id, profile_id)
+);
+create table if not exists public.reports (
+  id uuid primary key default gen_random_uuid(),
+  reporter_id uuid not null references public.profiles(id) on delete cascade,
+  target_type text not null check (target_type in ('exchange_review','session_feedback','forum_post','forum_comment','session')),
+  target_id text not null check (char_length(target_id) between 1 and 100),
+  reason text not null check (char_length(btrim(reason)) between 5 and 500),
+  status text not null default 'open' check (status in ('open','reviewed','dismissed')),
+  created_at timestamptz not null default now()
+);
+create index if not exists exchange_reviews_reviewee_created_idx on public.exchange_reviews(reviewee_id, created_at desc, id desc);
+create index if not exists exchange_reviews_reviewer_idx on public.exchange_reviews(reviewer_id);
+create index if not exists group_feedback_session_created_idx on public.group_session_feedback(session_id, created_at desc, profile_id desc);
+create index if not exists group_feedback_profile_idx on public.group_session_feedback(profile_id);
+create index if not exists reports_reporter_idx on public.reports(reporter_id);
+create index if not exists reports_status_created_idx on public.reports(status, created_at desc);
+alter table public.exchange_reviews enable row level security;
+alter table public.group_session_feedback enable row level security;
+alter table public.reports enable row level security;
+drop policy if exists "Students read exchange reviews" on public.exchange_reviews;
+create policy "Students read exchange reviews" on public.exchange_reviews for select to authenticated using (true);
+drop policy if exists "Students read session feedback" on public.group_session_feedback;
+create policy "Students read session feedback" on public.group_session_feedback for select to authenticated using (true);
+drop policy if exists "Students read own reports" on public.reports;
+create policy "Students read own reports" on public.reports for select to authenticated using (reporter_id = (select auth.uid()));
+drop policy if exists "Students submit own reports" on public.reports;
+create policy "Students submit own reports" on public.reports for insert to authenticated
+  with check (reporter_id = (select auth.uid()) and status = 'open');
+revoke all on public.exchange_reviews, public.group_session_feedback, public.reports from public, anon, authenticated;
+grant select on public.exchange_reviews, public.group_session_feedback to authenticated;
+grant select, insert on public.reports to authenticated;
+
+create or replace function public.submit_exchange_review(p_exchange_id uuid, p_rating integer, p_comment text)
+returns text language plpgsql security definer set search_path = '' as $$
+declare v_user uuid := auth.uid(); v_exchange public.exchange_requests%rowtype; v_comment text := nullif(btrim(p_comment),'');
+begin
+  if v_user is null then return 'not_authenticated'; end if;
+  if p_rating is null or p_rating not between 1 and 5 or char_length(v_comment) > 500 then return 'invalid_input'; end if;
+  select * into v_exchange from public.exchange_requests where id = p_exchange_id for update;
+  if not found then return 'not_found'; end if;
+  if v_user not in (v_exchange.requester_id,v_exchange.recipient_id) then return 'not_allowed'; end if;
+  if v_exchange.status <> 'completed' then return 'not_completed'; end if;
+  insert into public.exchange_reviews(exchange_id,reviewer_id,reviewee_id,rating,comment)
+    values (p_exchange_id,v_user,case when v_user = v_exchange.requester_id then v_exchange.recipient_id else v_exchange.requester_id end,p_rating,v_comment)
+    on conflict (exchange_id,reviewer_id) do nothing;
+  if not found then return 'already_reviewed'; end if;
+  return 'ok';
+end;
+$$;
+revoke execute on function public.submit_exchange_review(uuid,integer,text) from public, anon;
+grant execute on function public.submit_exchange_review(uuid,integer,text) to authenticated;
+
+create or replace function public.submit_session_feedback(p_session_id uuid, p_rating integer, p_helpful boolean, p_comment text)
+returns text language plpgsql security definer set search_path = '' as $$
+declare v_user uuid := auth.uid(); v_session public.group_sessions%rowtype; v_comment text := nullif(btrim(p_comment),'');
+begin
+  if v_user is null then return 'not_authenticated'; end if;
+  if p_rating is null or p_rating not between 1 and 5 or p_helpful is null or char_length(v_comment) > 500 then return 'invalid_input'; end if;
+  select * into v_session from public.group_sessions where id = p_session_id for update;
+  if not found then return 'not_found'; end if;
+  if v_session.organizer_id = v_user then return 'is_organizer'; end if;
+  if v_session.status <> 'completed' then return 'not_completed'; end if;
+  if not exists (select 1 from public.group_session_registrations where session_id = p_session_id and profile_id = v_user) then return 'not_registered'; end if;
+  insert into public.group_session_feedback(session_id,profile_id,rating,helpful,comment)
+    values (p_session_id,v_user,p_rating,p_helpful,v_comment) on conflict (session_id,profile_id) do nothing;
+  if not found then return 'already_submitted'; end if;
+  return 'ok';
+end;
+$$;
+revoke execute on function public.submit_session_feedback(uuid,integer,boolean,text) from public, anon;
+grant execute on function public.submit_session_feedback(uuid,integer,boolean,text) to authenticated;
+
+create or replace function public.notify_exchange_review()
+returns trigger language plpgsql security definer set search_path = '' as $$
+begin
+  perform public.create_notification(new.reviewee_id,'exchange_review','New review','Your exchange partner shared feedback.','/exchanges/' || new.exchange_id::text);
+  return new;
+end;
+$$;
+revoke execute on function public.notify_exchange_review() from public, anon, authenticated;
+drop trigger if exists notify_exchange_review on public.exchange_reviews;
+create trigger notify_exchange_review after insert on public.exchange_reviews for each row execute function public.notify_exchange_review();
+
+create or replace function public.get_rating_summary(p_profile_id uuid)
+returns table(average numeric,review_count bigint) language sql stable security invoker set search_path = '' as $$
+  select avg(rating)::numeric,count(*) from public.exchange_reviews where reviewee_id = p_profile_id;
+$$;
+revoke execute on function public.get_rating_summary(uuid) from public, anon;
+grant execute on function public.get_rating_summary(uuid) to authenticated;
+
+create or replace function public.get_session_feedback_summary(p_session_id uuid)
+returns table(average numeric,review_count bigint) language sql stable security invoker set search_path = '' as $$
+  select avg(rating)::numeric,count(*) from public.group_session_feedback where session_id = p_session_id;
+$$;
+revoke execute on function public.get_session_feedback_summary(uuid) from public, anon;
+grant execute on function public.get_session_feedback_summary(uuid) to authenticated;

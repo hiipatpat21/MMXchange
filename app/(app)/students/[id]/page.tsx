@@ -1,4 +1,5 @@
 import { LoadingState } from "@/components/ui/loading-state";
+import { ProfileReviews } from "@/components/feedback/profile-reviews";
 import Link from "next/link";
 import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
@@ -41,6 +42,7 @@ async function StudentProfile({ params }: { params: Promise<{ id: string }> }) {
         );
       }))}
       <Link href="/discover" className="inline-flex min-h-11 items-center text-sm text-primary underline">Back to Discover</Link>
+      <Suspense fallback={<LoadingState label="Loading exchange reviews…" />}><ProfileReviews profileId={id} /></Suspense>
     </article>
   );
 }

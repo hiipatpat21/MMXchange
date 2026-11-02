@@ -15,16 +15,16 @@ export async function loadExchangeSessions(supabase: SupabaseClient, exchangeId:
 }
 
 // Passing the current time explicitly makes the next-action rules testable.
-export function getExchangeProgress(exchange: ExchangeDetail, sessions: ExchangeSession[], userId: string, otherName: string, now: number) {
+export function getExchangeProgress(exchange: ExchangeDetail, sessions: ExchangeSession[], userId: string, otherName: string, now: number, feedbackSubmitted: boolean | null = false) {
   const ownConfirmation = userId === exchange.requester_id ? exchange.requester_completed_at : exchange.recipient_completed_at;
   const started = sessions.some((slot) => slot.status !== "cancelled" && Date.parse(slot.starts_at) <= now);
   const nextSession = sessions.filter((slot) => slot.status === "scheduled" && Date.parse(slot.starts_at) > now).sort((a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at))[0] ?? null;
   const canComplete = exchange.status === "scheduled" && started && !ownConfirmation;
-  const currentStep = exchange.status === "completed" ? 4 : exchange.status === "scheduled" ? 3 : exchange.status === "accepted" ? 2 : 1;
+  const currentStep = exchange.status === "completed" ? feedbackSubmitted ? 5 : 4 : exchange.status === "scheduled" ? 3 : exchange.status === "accepted" ? 2 : 1;
   let nextAction = "Find another learning partner on Discover.";
   if (exchange.status === "pending") nextAction = userId === exchange.recipient_id ? "Review and respond to this request." : `Waiting for ${otherName} to respond.`;
   if (exchange.status === "accepted") nextAction = "Schedule your first session.";
   if (exchange.status === "scheduled") nextAction = ownConfirmation ? `Waiting for ${otherName} to confirm completion.` : started ? "Mark the exchange as completed." : "Prepare for your session.";
-  if (exchange.status === "completed") nextAction = "Your exchange is complete. Feedback will be available in a later phase.";
+  if (exchange.status === "completed") nextAction = feedbackSubmitted === null ? "Reload to check your feedback status." : feedbackSubmitted ? "Feedback submitted. Thank you for sharing your experience." : "Share feedback about your exchange below.";
   return { currentStep, nextAction, canComplete, nextSession };
 }
