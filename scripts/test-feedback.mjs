@@ -26,6 +26,7 @@ const client = {
   rpc: async (name, args) => { calls.push({ name, args }); return { data: code, error: failed ? {} : null }; },
   from: table => ({
     select: () => {
+      calls.push({ selectTable: table });
       const builder = { eq: () => builder, maybeSingle: async () => ({ data: targetExists ? { id } : null, error: null }) };
       return builder;
     },
@@ -86,6 +87,12 @@ assert.equal(calls.at(-1).table, "reports");
 assert.equal(calls.at(-1).row.reporter_id, actor);
 assert.equal(calls.at(-1).row.target_id, `${id}:${actor}`);
 assert.equal(calls.at(-1).row.status, undefined, "Report status uses the database's open default");
+for (const [targetType, table] of [["forum_post", "forum_posts"], ["forum_comment", "forum_comments"]]) {
+  assert.ok((await actions.submitReport(null, report({ targetType })))?.message);
+  assert.equal(calls.at(-2).selectTable, table);
+  assert.equal(calls.at(-1).row.target_type, targetType);
+  assert.equal(calls.at(-1).row.reporter_id, actor);
+}
 assert.equal(feedback.ratingSummaryText({ average: 4.3333, review_count: "3" }), "4.3 out of 5 · 3 reviews");
 assert.equal(feedback.ratingSummaryText({ average: null, review_count: 0 }), "No reviews yet.");
 const { getExchangeProgress } = load("lib/exchange-sessions.ts");

@@ -25,7 +25,7 @@ The Node script mocks Supabase to check validation, server-derived report author
 
 - Exchange review reports use the review UUID.
 - Session feedback has a composite primary key, so report `target_id` is `session UUID:student UUID`.
-- `session`, `forum_post`, and `forum_comment` report types are reserved for reusable controls; no unfinished forum controls are shown.
+- The forum (Prompt 10) reuses the same Report control for posts and replies. The `session` target type is available for future session-level controls.
 - Ratings/comments are readable by any logged-in student. They do not grant access to the underlying private exchange. Reports are private to their reporter in the app/API; the developer can inspect them in the Table Editor.
 - Group feedback eligibility uses the registration record; the app does not verify attendance.
 - Reviews and feedback are submitted once and cannot be edited/deleted by students. Reporting does not hide them automatically.

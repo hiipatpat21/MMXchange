@@ -860,3 +860,96 @@ returns table(average numeric,review_count bigint) language sql stable security 
 $$;
 revoke execute on function public.get_session_feedback_summary(uuid) from public, anon;
 grant execute on function public.get_session_feedback_summary(uuid) to authenticated;
+
+-- Prompt 10: learning forum posts, replies, and reply notifications.
+create table if not exists public.forum_posts (
+  id uuid primary key default gen_random_uuid(),
+  author_id uuid not null references public.profiles(id) on delete cascade,
+  category text not null check (category in ('programming','design','academics','career','creative','resources','general')),
+  title text not null check (char_length(btrim(title)) between 5 and 120),
+  body text not null check (char_length(btrim(body)) between 10 and 5000),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create table if not exists public.forum_comments (
+  id uuid primary key default gen_random_uuid(),
+  post_id uuid not null references public.forum_posts(id) on delete cascade,
+  author_id uuid not null references public.profiles(id) on delete cascade,
+  body text not null check (char_length(btrim(body)) between 1 and 2000),
+  created_at timestamptz not null default now()
+);
+create index if not exists forum_posts_category_created_idx on public.forum_posts(category, created_at desc, id desc);
+create index if not exists forum_posts_author_created_idx on public.forum_posts(author_id, created_at desc, id desc);
+create index if not exists forum_posts_created_idx on public.forum_posts(created_at desc, id desc);
+create index if not exists forum_comments_post_created_idx on public.forum_comments(post_id, created_at, id);
+create index if not exists forum_comments_author_idx on public.forum_comments(author_id);
+alter table public.forum_posts enable row level security;
+alter table public.forum_comments enable row level security;
+drop policy if exists "Students read forum posts" on public.forum_posts;
+create policy "Students read forum posts" on public.forum_posts for select to authenticated using (true);
+drop policy if exists "Students create own forum posts" on public.forum_posts;
+create policy "Students create own forum posts" on public.forum_posts for insert to authenticated with check (author_id = (select auth.uid()));
+drop policy if exists "Authors update forum posts" on public.forum_posts;
+create policy "Authors update forum posts" on public.forum_posts for update to authenticated
+  using (author_id = (select auth.uid())) with check (author_id = (select auth.uid()));
+drop policy if exists "Authors delete forum posts" on public.forum_posts;
+create policy "Authors delete forum posts" on public.forum_posts for delete to authenticated using (author_id = (select auth.uid()));
+drop policy if exists "Students read forum replies" on public.forum_comments;
+create policy "Students read forum replies" on public.forum_comments for select to authenticated using (true);
+drop policy if exists "Students create own forum replies" on public.forum_comments;
+create policy "Students create own forum replies" on public.forum_comments for insert to authenticated with check (author_id = (select auth.uid()));
+drop policy if exists "Authors update forum replies" on public.forum_comments;
+create policy "Authors update forum replies" on public.forum_comments for update to authenticated
+  using (author_id = (select auth.uid())) with check (author_id = (select auth.uid()));
+drop policy if exists "Authors delete forum replies" on public.forum_comments;
+create policy "Authors delete forum replies" on public.forum_comments for delete to authenticated using (author_id = (select auth.uid()));
+revoke all on public.forum_posts, public.forum_comments from public, anon, authenticated;
+grant select, insert, delete on public.forum_posts, public.forum_comments to authenticated;
+-- Authors can edit content but cannot change ownership, IDs, parent posts, or timestamps.
+grant update (title, category, body) on public.forum_posts to authenticated;
+grant update (body) on public.forum_comments to authenticated;
+
+create or replace function public.stamp_forum_post()
+returns trigger language plpgsql set search_path = '' as $$
+begin
+  new.title := btrim(new.title);
+  new.body := btrim(new.body);
+  if tg_op = 'INSERT' then
+    new.created_at := clock_timestamp();
+    new.updated_at := new.created_at;
+  else
+    new.updated_at := clock_timestamp();
+  end if;
+  return new;
+end;
+$$;
+revoke execute on function public.stamp_forum_post() from public, anon, authenticated;
+drop trigger if exists stamp_forum_post on public.forum_posts;
+create trigger stamp_forum_post before insert or update on public.forum_posts for each row execute function public.stamp_forum_post();
+
+create or replace function public.stamp_forum_comment()
+returns trigger language plpgsql set search_path = '' as $$
+begin
+  new.body := btrim(new.body);
+  new.created_at := clock_timestamp();
+  return new;
+end;
+$$;
+revoke execute on function public.stamp_forum_comment() from public, anon, authenticated;
+drop trigger if exists stamp_forum_comment on public.forum_comments;
+create trigger stamp_forum_comment before insert on public.forum_comments for each row execute function public.stamp_forum_comment();
+
+create or replace function public.notify_forum_reply()
+returns trigger language plpgsql security definer set search_path = '' as $$
+declare v_author uuid; v_title text;
+begin
+  select author_id,title into v_author,v_title from public.forum_posts where id = new.post_id;
+  if v_author is not null and v_author <> new.author_id then
+    perform public.create_notification(v_author,'forum_reply','New reply to your post',v_title,'/forum/' || new.post_id::text);
+  end if;
+  return new;
+end;
+$$;
+revoke execute on function public.notify_forum_reply() from public, anon, authenticated;
+drop trigger if exists notify_forum_reply on public.forum_comments;
+create trigger notify_forum_reply after insert on public.forum_comments for each row execute function public.notify_forum_reply();

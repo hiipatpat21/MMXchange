@@ -40,14 +40,13 @@ export async function submitReport(_previous: FeedbackState, formData: FormData)
   if (authError || !user) return { error: "Please log in again." };
   const { targetType, targetId, reason } = parsed.data;
   // Composite feedback key is stored as session UUID:student UUID.
-  // Forum controls become available when that feature is built.
-  if (targetType === "forum_post" || targetType === "forum_comment") return { error: "Forum reporting is not available yet." };
   let request;
   if (targetType === "session_feedback") {
     const [sessionId, profileId] = targetId.split(":");
     request = supabase.from("group_session_feedback").select("session_id").eq("session_id", sessionId).eq("profile_id", profileId).maybeSingle();
   } else {
-    request = supabase.from(targetType === "exchange_review" ? "exchange_reviews" : "group_sessions").select("id").eq("id", targetId).maybeSingle();
+    const table = targetType === "exchange_review" ? "exchange_reviews" : targetType === "forum_post" ? "forum_posts" : targetType === "forum_comment" ? "forum_comments" : "group_sessions";
+    request = supabase.from(table).select("id").eq("id", targetId).maybeSingle();
   }
   const { data: target, error: targetError } = await request;
   if (targetError || !target) return { error: "Could not find this item. Please refresh and try again." };
