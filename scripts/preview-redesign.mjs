@@ -89,8 +89,16 @@ const tree = h("div", { className: "flex min-h-screen bg-background" }, h(Sideba
   h("main", { className: "app-content mx-auto w-full max-w-[1164px] px-4 pb-12 pt-4 sm:px-6 lg:px-8 lg:pt-6" },
     h("div", { className: "space-y-6" }, h("header", { className: "space-y-2" }, greeting, h("p", { className: "text-sm text-muted-foreground" }, "A little learning, a little sharing. What's next for you?")), checklist, h("div", { className: "dashboard-grid" }, panels))),
   h("p", { className: "px-8 pb-4 text-xs text-muted-foreground" }, "Visual fixture only. Fictional sample data; not an authenticated session.")));
-const css = readdirSync(".next/static", { recursive: true }).filter(file => file.endsWith(".css")).map(file => `<link rel="stylesheet" href="/.next/static/${file.replaceAll(path.sep, "/")}">`).join("");
+const css = readdirSync(".next/static", { recursive: true }).filter(file => file.endsWith(".css")).map(file => `<link rel="stylesheet" href="/.next/static/${file.replaceAll(path.sep, "/")}">`).join("")
+  + `<style>@font-face{font-family:"Plus Jakarta Sans";src:url("/public/fonts/plus-jakarta-sans-variable.ttf") format("truetype");font-weight:200 800;font-display:swap}html{--font-jakarta:"Plus Jakarta Sans"}</style>`;
 mkdirSync(".taste-skill/preview", { recursive: true });
 const output = `.taste-skill/preview/dashboard-${mode}.html`;
 writeFileSync(output, `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MMXchange layout fixture</title>${css}</head><body>${renderToStaticMarkup(tree)}</body></html>`);
 console.log(`Wrote isolated ${mode} dashboard fixture: ${output}`);
+
+// Check the shared section introduction independently of authentication and live data.
+const { PageIntro } = load("components/layout/page-intro.tsx");
+const intro = h("main", { className: "app-content mx-auto max-w-3xl px-4 py-8 sm:px-6" },
+  h(PageIntro, { title: "Good questions belong here", description: "Ask, explain, or share a resource that made something click." },
+    h("a", { href: "/forum/new", className: "inline-flex min-h-11 items-center rounded-full bg-primary px-5 text-sm text-primary-foreground" }, "Start a discussion")));
+writeFileSync(".taste-skill/preview/section-intro.html", `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MMXchange introduction fixture</title>${css}</head><body>${renderToStaticMarkup(intro)}</body></html>`);

@@ -8,7 +8,7 @@ export function DashboardSection({ title, href, actionLabel, children }: {
   return (
     <section aria-labelledby={id} className="dashboard-panel">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id={id} className="text-base font-semibold">{title}</h2>
+        <h2 id={id} className="text-lg font-bold">{title}</h2>
         {href && actionLabel && <Link href={href} className="inline-flex min-h-11 items-center text-sm text-primary hover:underline">{actionLabel}<span aria-hidden="true" className="ml-2">→</span></Link>}
       </div>
       {children}
@@ -17,7 +17,7 @@ export function DashboardSection({ title, href, actionLabel, children }: {
 }
 
 export function DashboardEmpty({ message, href, label }: { message: string; href: string; label: string }) {
-  return <div className="space-y-2"><p className="text-sm text-muted-foreground">{message}</p><Button asChild variant="outline"><Link href={href}>{label}</Link></Button></div>;
+  return <div className="space-y-2"><p className="text-base text-muted-foreground">{message}</p><Button asChild variant="outline"><Link href={href}>{label}</Link></Button></div>;
 }
 
 export function DashboardError({ title }: { title: string }) {

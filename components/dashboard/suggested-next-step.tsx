@@ -2,6 +2,7 @@ import { getDashboardContext, getDashboardMatches, chooseDashboardSuggestion } f
 import { DashboardError } from "@/components/dashboard/dashboard-section";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { LearningIllustration } from "@/components/ui/learning-illustration";
 
 export async function SuggestedNextStep() {
   const { supabase, user } = await getDashboardContext();
@@ -30,10 +31,13 @@ export async function SuggestedNextStep() {
     hasHosted: !!hosted.data?.length,
   });
   return (
-    <section className="dashboard-panel space-y-5" aria-labelledby="next-step-heading">
-      <h2 id="next-step-heading" className="text-base font-semibold">Your next step</h2>
-      <h3 className="max-w-lg text-2xl font-medium leading-tight">{suggestion.title}</h3>
-      <p className="max-w-lg text-sm text-muted-foreground">{suggestion.reason}</p>
+    <section className="dashboard-panel next-step-panel" aria-labelledby="next-step-heading">
+      <h2 id="next-step-heading" className="text-lg font-bold">Your next step</h2>
+      <h3 className="max-w-lg text-xl font-bold leading-tight sm:text-2xl">{suggestion.title}</h3>
+      <div className="flex items-center gap-4">
+        <p className="min-w-0 flex-1 text-base text-muted-foreground">{suggestion.reason}</p>
+        <LearningIllustration scene="curious" className="w-24 shrink-0 sm:w-28" sizes="(max-width: 639px) 96px, 112px" />
+      </div>
       <Button asChild><Link href={suggestion.href}>{suggestion.label}<span aria-hidden="true">→</span></Link></Button>
     </section>
   );

@@ -7,9 +7,14 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Arial, sans-serif;
+  --font-sans: var(--font-jakarta), "Segoe UI", Arial, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  --font-heading: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Arial, sans-serif;
+  --font-heading: var(--font-jakarta), "Segoe UI", Arial, sans-serif;
+  /* Small text remains readable instead of falling to 12px captions. */
+  --text-xs: 0.875rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.6;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,25 +53,27 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 
   --color-brand-gold: var(--brand-gold);
+  --color-learning-sage: var(--learning-sage);
+  --color-learning-gold: var(--learning-gold);
 }
 
 :root {
-  --background: #f7f8f5;
-  --foreground: #1d1d1f;
+  --background: #f4f7f2;
+  --foreground: #202b20;
   --card: oklch(1 0 0);
-  --card-foreground: #1d1d1f;
+  --card-foreground: #202b20;
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: #0c4b05;
   --primary-foreground: #ffffff;
-  --secondary: #edf0e9;
+  --secondary: #e8eee4;
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: #edf0e9;
-  --muted-foreground: #626269;
+  --muted: #e8eee4;
+  --muted-foreground: #576153;
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: #e4e7df;
+  --destructive: #b42318;
+  --border: #dde5d8;
   --input: #8b8e97;
   --ring: #0c4b05;
   --chart-1: oklch(0.87 0 0);
@@ -85,6 +92,9 @@
   --sidebar-ring: oklch(0.708 0 0);
   
   --brand-gold: #ffb800;
+  /* Supporting surface tones, not additional university brand colors. */
+  --learning-sage: #e3eedc;
+  --learning-gold: #fff0bc;
 }
 
 .dark {
@@ -134,6 +144,8 @@
     @apply font-sans;
     scroll-padding-top: 6rem;
   }
+  /* Reserve the same width whether the shorter or longer auth form needs scrolling. */
+  html:has(.auth-story) { scrollbar-gutter: stable; }
   h1, h2, h3, h4 { text-wrap: balance; line-height: 1.25; }
   h1 { letter-spacing: -0.035em; }
   h2, h3 { letter-spacing: -0.02em; }
@@ -141,7 +153,7 @@
   a, button, input, select, textarea, summary { scroll-margin-top: 6rem; }
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
   select {
-    @apply min-h-11 w-full min-w-0 rounded-xl border border-input bg-card px-3 text-base outline-none transition-colors sm:text-sm;
+    @apply min-h-11 w-full min-w-0 rounded-xl border border-input bg-card px-3 text-base outline-none transition-colors;
   }
   select:focus-visible { border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 12%, transparent); }
   summary { @apply min-h-11 cursor-pointer rounded-lg; }
@@ -155,7 +167,7 @@
 }
 
 @utility page-heading {
-  @apply text-2xl font-semibold tracking-tight sm:text-3xl;
+  @apply text-[1.75rem] font-bold tracking-tight sm:text-[2rem];
 }
 
 @layer components {
@@ -163,11 +175,13 @@
     @apply fixed left-4 top-4 z-[100] -translate-y-24 rounded-xl bg-primary px-5 py-3 font-medium text-primary-foreground transition-transform focus:translate-y-0;
   }
   .app-content > * { min-width: 0; }
+  .sidebar-scroll { scrollbar-width: none; }
+  .sidebar-scroll::-webkit-scrollbar { display: none; }
   .app-content header > p { max-width: 65ch; }
   .app-content form { min-width: 0; }
   .app-content [role="alert"] { line-height: 1.6; }
-  .page-intro { @apply flex flex-wrap items-end justify-between gap-4; }
-  .page-intro p { @apply mt-2 max-w-xl text-sm text-muted-foreground; }
+  .page-intro { @apply flex flex-wrap items-center justify-between gap-4; }
+  .page-intro p { @apply mt-2 max-w-xl text-base text-muted-foreground; }
   .filter-panel { @apply rounded-2xl border bg-card p-4 sm:p-5; }
   .section-tabs { @apply flex flex-wrap gap-1 border-b pb-2; }
   .section-tabs a { @apply inline-flex min-h-11 items-center rounded-lg px-4 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground; }
@@ -181,12 +195,17 @@
   .dashboard-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
   /* At 1100px: 12 × 77px columns + 11 × 16px gaps = 1100px. */
   .dashboard-grid > * { grid-column: span 12; min-width: 0; }
-  .dashboard-panel { @apply min-w-0 space-y-4 rounded-2xl bg-secondary/60 p-5 sm:p-6; }
+  .dashboard-panel { @apply min-w-0 space-y-4 rounded-2xl border bg-card p-5 sm:p-6; }
+  .next-step-panel { @apply border-transparent bg-learning-sage; }
   .dashboard-row { @apply flex min-h-16 items-center justify-between gap-4 rounded-xl px-2 py-3 transition-colors hover:bg-card; }
   .dashboard-row p { @apply break-words; }
   .public-page { @apply bg-card; }
   .public-page section { scroll-margin-top: 2rem; }
   .public-page .surface-card { @apply border-0 bg-secondary/60; }
+  .landing-frame { @apply mx-auto w-full max-w-6xl px-5 sm:px-8; }
+  .landing-hero, .auth-story { @apply bg-learning-sage text-foreground; }
+  .landing-start { @apply bg-learning-gold text-foreground; }
+  .landing-text-link { @apply inline-flex min-h-11 items-center gap-2 rounded-lg font-semibold text-primary underline decoration-primary/30 underline-offset-4 transition-colors hover:decoration-primary; }
   @media (min-width: 768px) {
     .dashboard-grid > .dashboard-main { grid-column: span 6; }
     .dashboard-grid > .dashboard-side { grid-column: span 6; }
