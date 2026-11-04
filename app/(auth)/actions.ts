@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
-import { emailDomainAllowed } from "@/lib/auth-redirects";
+import { emailDomainAllowed, getSiteUrl } from "@/lib/auth-redirects";
 import { recoveryCookieName } from "@/lib/recovery";
 
 type AuthState = { error?: string; message?: string } | null;
@@ -46,11 +46,18 @@ export async function register(_prev: AuthState, formData: FormData): Promise<Au
     return { error: "Please use an email address from a domain allowed by this project." };
   }
 
+  let origin: string;
+  try { origin = getSiteUrl(); }
+  catch { return { error: "Registration is not configured. Please try again later." }; }
+
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
-    options: { data: { display_name: parsed.data.displayName } },
+    options: {
+      data: { display_name: parsed.data.displayName },
+      emailRedirectTo: `${origin}/auth/callback`,
+    },
   });
   if (error) return { error: "Could not create your account. Please check your details and try again later." };
 

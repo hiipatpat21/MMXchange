@@ -1,9 +1,11 @@
 export function getSiteUrl(): string {
   const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (!configured && process.env.NODE_ENV === "production") throw new Error("Set NEXT_PUBLIC_SITE_URL for password recovery.");
+  if (!configured && process.env.NODE_ENV === "production") throw new Error("Set NEXT_PUBLIC_SITE_URL for authentication emails.");
   const url = new URL(configured || "http://localhost:3000");
   if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) throw new Error("Invalid site URL.");
+  if (url.pathname !== "/" || url.search || url.hash) throw new Error("Use the site origin without a path or query.");
   if (process.env.NODE_ENV === "production" && url.protocol !== "https:") throw new Error("Use HTTPS for the production site URL.");
+  if (process.env.NODE_ENV === "production" && ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)) throw new Error("Use the deployed hostname for authentication emails.");
   return url.origin;
 }
 
