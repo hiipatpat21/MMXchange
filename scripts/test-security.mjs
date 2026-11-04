@@ -31,6 +31,12 @@ env.NEXT_PUBLIC_SITE_URL = "http://example.test";
 assert.throws(() => redirects.getSiteUrl());
 env.NEXT_PUBLIC_SITE_URL = "https://example.test";
 assert.equal(redirects.getSiteUrl(), "https://example.test");
+for (const invalid of ["https://localhost", "https://127.0.0.1", "https://[::1]", "https://example.test/auth/callback", "https://example.test?next=/dashboard", "https://user:password@example.test"]) {
+  env.NEXT_PUBLIC_SITE_URL = invalid;
+  assert.throws(() => redirects.getSiteUrl());
+}
+env.NEXT_PUBLIC_SITE_URL = "https://example.test/";
+assert.equal(redirects.getSiteUrl(), "https://example.test");
 const { notificationDestination } = load("lib/notifications.ts", { "@/lib/supabase/server": {} });
 for (const section of ["exchanges", "sessions", "messages", "forum"]) assert.equal(notificationDestination(`/${section}/${actor}`), `/${section}/${actor}`);
 for (const route of [null, "//evil.example", "https://evil.example", `/forum/${actor}/../login`, "/forum/not-a-uuid", `/forum/${actor}?next=https://evil.example`]) assert.equal(notificationDestination(route), "/notifications");
@@ -92,10 +98,16 @@ for (const route of ["/", "/login", "/register", "/forgot-password", "/reset-pas
 signedIn = true;
 assert.equal((await proxy(request("/login"))).url, "https://app.example/dashboard");
 assert.equal((await proxy(request("/reset-password"))).kind, "next");
+let signupPayload;
 const auth = load("app/(auth)/actions.ts", {
-  "@/lib/supabase/server": { createClient: async () => ({ auth: { signUp: async () => ({ data: null, error: { message: "private provider diagnostic" } }) } }) },
+  "@/lib/supabase/server": { createClient: async () => ({ auth: { signUp: async payload => { signupPayload = payload; return { data: null, error: { message: "private provider diagnostic" } }; } } }) },
   "@/lib/auth-redirects": redirects, "@/lib/recovery": { recoveryCookieName: "test" },
   "next/headers": {}, "next/navigation": {},
 });
 assert.equal((await auth.register(null, form({ email: "a@example.test", displayName: "Student", password: "test-password-123" }))).error.includes("private provider"), false);
+assert.equal(signupPayload.options.emailRedirectTo, "https://example.test/auth/callback");
+signupPayload = undefined;
+env.NEXT_PUBLIC_SITE_URL = "http://localhost:3000";
+assert.match((await auth.register(null, form({ email: "a@example.test", displayName: "Student", password: "test-password-123" }))).error, /not configured/);
+assert.equal(signupPayload, undefined);
 console.log("Security regression checks passed: redirect allowlists, avatars, skill identities/errors, route protection, and signup errors.");
