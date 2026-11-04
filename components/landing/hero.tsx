@@ -4,38 +4,34 @@ import { Button } from "@/components/ui/button"
 
 export function Hero () {
     return (
-        <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 md:grid-cols-2 md:py-24 lg:gap-16">
+        <section className="mx-auto grid max-w-6xl items-center gap-8 px-5 py-12 sm:px-8 md:grid-cols-[0.85fr_1.15fr] md:py-20">
             <div className="space-y-6">
                 {/*
                 <span className="inline-block rounded-full bg-brand-gold px-3 py-1 text-xs font-semibold text-primary">
                     For MMSU students
                 </span>
                 */}
-                <p className="text-sm font-semibold text-primary">A student learning community</p>
-                <h1 className="text-[2.625rem] font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">
-                    Learn something new.{" "}
-                    <span className="text-primary">Share what you know.</span>
-                </h1>
+                <h1 className="max-w-md text-[2.5rem] font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">A skill for a skill.</h1>
                 <p className="max-w-prose text-lg text-muted-foreground">
-                    Swap skills one-on-one with a fellow student, or join a group session
-                    hosted by someone who knows the topic.
+                    You know something worth sharing. Find a learning partner or join a group session in your MMSU student community.
                 </p>
                 <div className="flex flex-wrap gap-3">
                     <Button size="lg" asChild>
-                        <Link href="/register">Get started</Link>
+                        <Link href="/register">Find your learning people →</Link>
                     </Button>
-                    <Button size="lg" variant="outline" asChild>
-                        <Link href="/login">I already have an account</Link>
-                    </Button>
+                    <Link href="#ways-to-learn" className="inline-flex min-h-12 items-center px-2 text-sm font-medium text-foreground underline underline-offset-4">See how it works</Link>
                 </div>
             </div>
 
             <Image
-                src="/fem-hall.png"
-                alt="Front view of the MMSU FEM Hall"
-                width={1600}
+                src="/learning-together.webp"
+                alt="Illustration of students sharing drawing, coding, and music skills around a table"
+                width={1200}
                 height={900}
-                className="h-auto w-full rounded-2xl border object-cover shadow-sm"
+                priority
+                unoptimized
+                sizes="(max-width: 767px) 100vw, 60vw"
+                className="h-auto w-full object-contain"
             />
         </section>
     )

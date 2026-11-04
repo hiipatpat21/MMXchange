@@ -31,8 +31,8 @@ export function ProfileForm({ profile }: { profile: Profile }) {
   const programs = colleges.find((c) => c.name === college)?.programs ?? [];
 
   return (
-    <form action={formAction} className="space-y-4 surface-card p-6">
-      <div className="space-y-2">
+    <form action={formAction} className="grid gap-5 surface-card p-6 sm:grid-cols-2">
+      <div className="space-y-2 sm:col-span-2">
         <Label htmlFor="displayName">Display name</Label>
         <Input id="displayName" name="displayName" defaultValue={profile.display_name} required />
       </div>
@@ -96,22 +96,22 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         </select>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2 sm:col-span-2">
         <Label htmlFor="bio">Short introduction</Label>
         <Textarea id="bio" name="bio" rows={4} maxLength={300} defaultValue={profile.bio ?? ""} />
       </div>
 
       {state?.error && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="text-sm text-destructive sm:col-span-2">
           {state.error}
         </p>
       )}
       {state?.message && (
-        <p role="status" className="text-sm text-primary">
+        <p role="status" className="text-sm text-primary sm:col-span-2">
           {state.message}
         </p>
       )}
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" disabled={pending} className="justify-self-start sm:col-span-2">
         {pending ? "Saving..." : "Save profile"}
       </Button>
     </form>

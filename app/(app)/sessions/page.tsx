@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { SessionCard } from "@/components/sessions/session-card";
 import { SessionTabs } from "@/components/sessions/session-tabs";
 import { SessionFiltersForm } from "@/components/sessions/session-filters";
+import { PageIntro } from "@/components/layout/page-intro";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -27,7 +28,7 @@ async function SessionList({ searchParams }: { searchParams: SearchParams }) {
   return <div className="space-y-5">
     <SessionFiltersForm filters={parsed.data} categories={categories} />
     <h2 className="text-xl font-semibold">Upcoming sessions</h2>
-    {result.sessions.length ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{result.sessions.map((session) => <SessionCard key={session.id} session={session} />)}</div> : <div className="space-y-3 rounded-xl border border-dashed bg-card p-6">
+    {result.sessions.length ? <div className="grid gap-4 sm:grid-cols-2">{result.sessions.map((session) => <SessionCard key={session.id} session={session} />)}</div> : <div className="space-y-3 rounded-xl border border-dashed bg-card p-6">
       <p className="font-medium">No upcoming sessions match these filters</p><p className="text-sm text-muted-foreground">Try clearing your filters, or share something you know by hosting a session.</p>
       <div className="flex flex-wrap gap-2"><Button asChild variant="outline" className="min-h-11"><Link href="/sessions">Clear filters</Link></Button><Button asChild className="min-h-11"><Link href="/sessions/new">Host a session</Link></Button></div>
     </div>}
@@ -36,7 +37,7 @@ async function SessionList({ searchParams }: { searchParams: SearchParams }) {
 
 export default function SessionsPage({ searchParams }: { searchParams: SearchParams }) {
   return <div className="space-y-6">
-    <div className="flex flex-wrap items-center justify-between gap-3"><header><h1 className="page-heading">Group sessions</h1><p className="mt-1 text-muted-foreground">Workshops and tutoring sessions hosted by MMSU students.</p></header><Button asChild className="min-h-11"><Link href="/sessions/new">Host a session</Link></Button></div>
+    <PageIntro title="Learn something together" description="Join a session, bring your curiosity. No skill swap needed."><Button asChild><Link href="/sessions/new">Host a session</Link></Button></PageIntro>
     <SessionTabs active="all" />
     <Suspense fallback={<LoadingState label="Loading sessions and filters..." />}><SessionList searchParams={searchParams} /></Suspense>
   </div>;

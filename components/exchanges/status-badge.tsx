@@ -2,9 +2,9 @@ import type { ExchangeStatus } from "@/lib/exchanges";
 import { Badge } from "@/components/ui/badge";
 
 const styles: Record<ExchangeStatus, string> = {
-  pending: "bg-brand-gold text-primary",
+  pending: "bg-brand-gold/20 text-primary",
   accepted: "bg-primary/10 text-primary",
-  scheduled: "bg-primary text-primary-foreground",
+  scheduled: "bg-primary/10 text-primary",
   completed: "border-primary bg-background text-primary",
   declined: "bg-destructive/10 text-destructive",
   cancelled: "bg-muted text-muted-foreground",

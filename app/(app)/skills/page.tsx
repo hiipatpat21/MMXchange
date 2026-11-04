@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SkillSection } from "@/components/skills/skill-section";
+import { PageIntro } from "@/components/layout/page-intro";
 
 async function SkillsLoader() {
   const supabase = await createClient();
@@ -11,10 +12,11 @@ async function SkillsLoader() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: allSkills }, { data: mine }] = await Promise.all([
+  const [{ data: allSkills, error: skillsError }, { data: mine, error: mineError }] = await Promise.all([
     supabase.from("skills").select("id, name, category").order("name"),
     supabase.from("profile_skills").select("skill_id, kind").eq("profile_id", user.id),
   ]);
+  if (skillsError || mineError) return <p role="alert" className="text-sm text-destructive">Could not load your skills. Please reload to try again.</p>;
 
   const skills = allSkills ?? [];
   const chosen = new Map((mine ?? []).map((r) => [r.skill_id, r.kind]));
@@ -46,12 +48,7 @@ async function SkillsLoader() {
 export default function SkillsPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <div>
-        <h1 className="page-heading">My skills</h1>
-        <p className="mt-1 text-muted-foreground">
-          We use these two lists to suggest students you could swap skills with.
-        </p>
-      </div>
+      <PageIntro title="What’s your thing?" description="Something to share. Something to discover. Your two lists bring the right people together." />
       <Suspense fallback={<LoadingState label="Loading your skills..." />}>
         <SkillsLoader />
       </Suspense>

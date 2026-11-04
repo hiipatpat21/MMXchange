@@ -113,22 +113,22 @@ async function SessionDetail({ params, searchParams }: PageProps) {
       </section>
 
       {session.objectives && (
-        <section>
-          <h2 className="text-lg font-semibold">What you&apos;ll learn</h2>
+        <details className="disclosure">
+          <summary>What you&apos;ll learn</summary>
           <p className="mt-2 whitespace-pre-line text-muted-foreground">{session.objectives}</p>
-        </section>
+        </details>
       )}
 
       {session.prerequisites && (
-        <section>
-          <h2 className="text-lg font-semibold">Requirements</h2>
+        <details className="disclosure">
+          <summary>Before you join</summary>
           <p className="mt-2 whitespace-pre-line text-muted-foreground">{session.prerequisites}</p>
-        </section>
+        </details>
       )}
 
       {isOrganizer && (
-        <section className="space-y-3 surface-card p-5">
-          <h2 className="text-lg font-semibold">Registered students ({registered})</h2>
+        <details className="disclosure" open={participantsError}>
+          <summary>Registered students ({registered})</summary>
           {participantsError ? <p role="alert" className="text-destructive">Could not load the participant list. Please reload to try again.</p> : participants.length === 0 ? (
             <p className="text-sm text-muted-foreground">No one has registered yet.</p>
           ) : (
@@ -141,7 +141,7 @@ async function SessionDetail({ params, searchParams }: PageProps) {
               ))}
             </ul>
           )}
-        </section>
+        </details>
       )}
 
       {(isOrganizer || isRegistered) && <Suspense fallback={<LoadingState label="Loading announcements…" />}><Announcements sessionId={id} organizer={isOrganizer} published={session.status === "published"} before={cursor.success ? cursor.data.announcementBefore : undefined} beforeId={cursor.success ? cursor.data.announcementBeforeId : undefined} /></Suspense>}

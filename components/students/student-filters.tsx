@@ -11,12 +11,13 @@ const selectClass = "h-11 w-full min-w-0 rounded-xl border border-input bg-card 
 export function StudentFiltersForm({ filters, skills }: { filters: StudentFilters; skills: FilterSkill[] }) {
   const categories = [...new Set(skills.map((skill) => skill.category))].sort();
   return (
-    <form action="/discover" method="get" className="grid gap-4 surface-card p-5 sm:grid-cols-2" key={JSON.stringify(filters)}>
+    <form action="/discover" method="get" className="filter-panel space-y-4" key={JSON.stringify(filters)}>
+      <input type="hidden" name="view" value="browse" />
       <div className="min-w-0 space-y-2">
         <Label htmlFor="q">Student name</Label>
         <Input id="q" name="q" defaultValue={filters.q} maxLength={100} placeholder="Search by name" className="h-10" />
       </div>
-      <div className="min-w-0 space-y-2">
+      <details open={!!(filters.category || filters.skill || filters.college)}><summary className="text-sm font-medium">More filters</summary><div className="grid gap-4 py-3 sm:grid-cols-2"><div className="min-w-0 space-y-2">
         <Label htmlFor="category">Teaching category</Label>
         <select id="category" name="category" defaultValue={filters.category} className={selectClass}>
           <option value="">All categories</option>
@@ -37,9 +38,10 @@ export function StudentFiltersForm({ filters, skills }: { filters: StudentFilter
           {colleges.map((college) => <option key={college.name} value={college.name}>{college.name}</option>)}
         </select>
       </div>
-      <div className="flex flex-wrap gap-2 sm:col-span-2">
+      </div></details>
+      <div className="flex flex-wrap gap-2">
         <Button type="submit" className="min-h-11">Apply filters</Button>
-        <Button asChild variant="outline" className="min-h-11"><Link href="/discover">Clear filters</Link></Button>
+        <Button asChild variant="ghost" className="min-h-11"><Link href="/discover?view=browse">Clear filters</Link></Button>
       </div>
     </form>
   );

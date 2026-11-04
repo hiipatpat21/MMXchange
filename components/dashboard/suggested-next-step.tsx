@@ -1,5 +1,7 @@
 import { getDashboardContext, getDashboardMatches, chooseDashboardSuggestion } from "@/lib/dashboard";
-import { DashboardSection, DashboardEmpty, DashboardError } from "@/components/dashboard/dashboard-section";
+import { DashboardError } from "@/components/dashboard/dashboard-section";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export async function SuggestedNextStep() {
   const { supabase, user } = await getDashboardContext();
@@ -28,9 +30,11 @@ export async function SuggestedNextStep() {
     hasHosted: !!hosted.data?.length,
   });
   return (
-    <DashboardSection title="Suggested next step">
-      <h3 className="font-medium">{suggestion.title}</h3>
-      <DashboardEmpty message={suggestion.reason} href={suggestion.href} label={suggestion.label} />
-    </DashboardSection>
+    <section className="dashboard-panel space-y-5" aria-labelledby="next-step-heading">
+      <h2 id="next-step-heading" className="text-base font-semibold">Your next step</h2>
+      <h3 className="max-w-lg text-2xl font-medium leading-tight">{suggestion.title}</h3>
+      <p className="max-w-lg text-sm text-muted-foreground">{suggestion.reason}</p>
+      <Button asChild><Link href={suggestion.href}>{suggestion.label}<span aria-hidden="true">→</span></Link></Button>
+    </section>
   );
 }

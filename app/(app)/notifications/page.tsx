@@ -8,6 +8,7 @@ import { getRecentNotifications, getUnreadCount } from "@/lib/notifications";
 import { NotificationOpenForm } from "@/components/notifications/notification-open-form";
 import { MarkAllReadForm } from "@/components/notifications/mark-all-read-form";
 import { Button } from "@/components/ui/button";
+import { PageIntro } from "@/components/layout/page-intro";
 
 async function NotificationList({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const params = await searchParams;
@@ -34,5 +35,5 @@ async function NotificationList({ searchParams }: { searchParams: Promise<Record
 }
 
 export default function NotificationsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  return <div className="mx-auto max-w-3xl space-y-6"><header><h1 className="page-heading">Notifications</h1><p className="mt-1 text-muted-foreground">Your exchange requests and group-session updates.</p></header><Suspense fallback={<LoadingState label="Loading notifications..." />}><NotificationList searchParams={searchParams} /></Suspense></div>;
+  return <div className="mx-auto max-w-3xl space-y-6"><PageIntro title="Your latest updates" description="New requests, replies, and a little nudge for what’s coming up." /><Suspense fallback={<LoadingState label="Loading notifications..." />}><NotificationList searchParams={searchParams} /></Suspense></div>;
 }

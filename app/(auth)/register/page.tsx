@@ -5,8 +5,8 @@ import { RegisterForm } from "../register-form"
 export default function RegisterPage() {
     return (
         <Card>
-            <CardHeader className="flex flex-col items-center text-center">
-                <CardTitle><h1 className="text-3xl font-semibold tracking-tight">Start learning together.</h1></CardTitle>
+            <CardHeader className="flex flex-col items-start">
+                <CardTitle><h1 className="page-heading">Find your people.</h1></CardTitle>
                 <CardDescription>
                     Create an account, then add your profile and skills.
                 </CardDescription>

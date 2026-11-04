@@ -9,6 +9,7 @@ import { MatchCard } from "@/components/students/match-card";
 import { StudentCard } from "@/components/students/student-card";
 import { StudentFiltersForm } from "@/components/students/student-filters";
 import { Button } from "@/components/ui/button";
+import { PageIntro } from "@/components/layout/page-intro";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 const filterSchema = z.object({
@@ -46,7 +47,7 @@ async function Recommendations({ supabase, userId }: { supabase: Awaited<ReturnT
 async function BrowseStudents({ supabase, userId, searchParams }: { supabase: Awaited<ReturnType<typeof createClient>>; userId: string; searchParams: SearchParams }) {
   const params = await searchParams;
   const parsed = filterSchema.safeParse({ q: params.q ?? "", category: params.category ?? "", skill: params.skill ?? "", college: params.college ?? "" });
-  if (!parsed.success) return <p role="alert" className="text-destructive">These filters are invalid. <Link href="/discover" className="underline">Clear filters</Link> and try again.</p>;
+  if (!parsed.success) return <p role="alert" className="text-destructive">These filters are invalid. <Link href="/discover?view=browse" className="underline">Clear filters</Link> and try again.</p>;
   const filters = parsed.data;
   const { data: skills, error: skillsError } = await supabase.from("skills").select("id, name, category").order("name");
   if (skillsError) return <p role="alert" className="text-destructive">Could not load filter options. Please reload to try again.</p>;
@@ -77,7 +78,7 @@ async function BrowseStudents({ supabase, userId, searchParams }: { supabase: Aw
         <div className="rounded-xl border border-dashed p-6">
           <p className="font-medium">No students match these filters</p>
           <p className="mt-1 text-sm text-muted-foreground">Clear your filters or check back as more students join.</p>
-          <Button asChild variant="outline" className="mt-4 min-h-11"><Link href="/discover">Clear filters</Link></Button>
+          <Button asChild variant="outline" className="mt-4 min-h-11"><Link href="/discover?view=browse">Clear filters</Link></Button>
         </div>
       )}
     </div>
@@ -89,16 +90,20 @@ async function DiscoverContent({ searchParams }: { searchParams: SearchParams })
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error) return <p role="alert" className="text-destructive">Could not verify your account. Please sign in again.</p>;
   if (!user) redirect("/login");
+  const query = await searchParams;
+  const view = query.view === "browse" || query.q || query.category || query.skill || query.college ? "browse" : "recommended";
   return (
     <>
+      <nav aria-label="Discover views" className="section-tabs"><Link href="/discover" aria-current={view === "recommended" ? "page" : undefined}>Your matches</Link><Link href="/discover?view=browse" aria-current={view === "browse" ? "page" : undefined}>Browse everyone</Link></nav>
+      {view === "recommended" ?
       <section className="space-y-4" aria-labelledby="recommended-heading">
-        <h2 id="recommended-heading" className="text-xl font-semibold">Recommended for you</h2>
+        <h2 id="recommended-heading" className="sr-only">Recommended for you</h2>
         <Suspense fallback={<LoadingState label="Finding learning partners..." />}><Recommendations supabase={supabase} userId={user.id} /></Suspense>
-      </section>
+      </section> :
       <section className="space-y-4" aria-labelledby="browse-heading">
-        <h2 id="browse-heading" className="text-xl font-semibold">Browse students</h2>
+        <h2 id="browse-heading" className="sr-only">Browse students</h2>
         <Suspense fallback={<LoadingState label="Loading students and filters..." />}><BrowseStudents supabase={supabase} userId={user.id} searchParams={searchParams} /></Suspense>
-      </section>
+      </section>}
     </>
   );
 }
@@ -106,7 +111,7 @@ async function DiscoverContent({ searchParams }: { searchParams: SearchParams })
 export default function DiscoverPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="space-y-8">
-      <header><h1 className="page-heading">Discover students</h1><p className="mt-1 text-muted-foreground">Find learning partners through the skills you can share.</p></header>
+      <PageIntro title="Find your learning people" description="You know something they want to learn. They might know your next favorite skill." />
       <Suspense fallback={<LoadingState label="Loading discovery..." />}><DiscoverContent searchParams={searchParams} /></Suspense>
     </div>
   );

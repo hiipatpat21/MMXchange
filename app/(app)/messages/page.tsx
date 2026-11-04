@@ -6,6 +6,7 @@ import { formatDateTime } from "@/lib/datetime";
 import type { Conversation } from "@/lib/messages";
 import { LoadingState } from "@/components/ui/loading-state";
 import { RefreshButton } from "@/components/messages/refresh-button";
+import { PageIntro } from "@/components/layout/page-intro";
 
 async function Conversations({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
   const query = await searchParams;
@@ -29,5 +30,5 @@ async function Conversations({ searchParams }: { searchParams: Promise<{ page?: 
 }
 
 export default function MessagesPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
-  return <div className="mx-auto max-w-2xl space-y-6"><header className="flex flex-wrap items-center justify-between gap-3"><h1 className="page-heading">Messages</h1><RefreshButton /></header><p className="text-muted-foreground">Private conversations with your exchange partners. Refresh to check for new messages.</p><Suspense fallback={<LoadingState label="Loading conversations…" />}><Conversations searchParams={searchParams} /></Suspense></div>;
+  return <div className="mx-auto max-w-3xl space-y-6"><PageIntro title="Keep the conversation going" description="Plan your next exchange in a private conversation. Refresh for new messages."><RefreshButton /></PageIntro><Suspense fallback={<LoadingState label="Loading conversations…" />}><Conversations searchParams={searchParams} /></Suspense></div>;
 }

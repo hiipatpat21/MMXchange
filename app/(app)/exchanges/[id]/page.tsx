@@ -65,22 +65,21 @@ async function ExchangeDetail({ params }: { params: Promise<{ id: string }> }) {
           <div><dt className="text-sm text-muted-foreground">Preferred format</dt><dd>{exchangeFormats[exchange.format]}</dd></div>
           {progress && <div><dt className="text-sm text-muted-foreground">Next meeting</dt><dd>{progress.nextSession ? `${formatDateTime(progress.nextSession.starts_at)} · ${progress.nextSession.duration_minutes} minutes` : "No upcoming meeting scheduled."}</dd></div>}
         </dl>
-        {!sessionsError && <div className="space-y-3">
-          <h3 className="text-sm font-semibold">Preparation for your next teaching slots</h3>
+        {!sessionsError && <details className="rounded-xl bg-secondary/50 px-4"><summary className="text-sm font-medium">Preparation notes</summary><div className="space-y-3 pb-4">
           {teachers.map((teacher) => {
             const slot = sessions.find((session) => session.teacher_id === teacher.id && session.status === "scheduled" && Date.parse(session.starts_at) > now);
             return <p key={teacher.id} className="whitespace-pre-line break-words text-sm text-muted-foreground"><span className="font-medium text-foreground">{teacher.name} teaches {teacher.skillName}: </span>{slot ? slot.notes || "No preparation notes provided." : "No upcoming slot in this direction."}</p>;
           })}
-        </div>}
+        </div></details>}
       </section>
-      <section className="space-y-4 surface-card p-5">
-        <h2 className="text-lg font-semibold">Request details</h2>
+      <details className="disclosure" open={canRespond}>
+        <summary>Original request & learning goals</summary>
         <dl className="space-y-4 break-words">
           <div><dt className="font-medium">Message</dt><dd className="mt-1 whitespace-pre-line text-muted-foreground">{exchange.message}</dd></div>
           <div><dt className="font-medium">Availability</dt><dd className="mt-1 whitespace-pre-line text-muted-foreground">{exchange.availability || "Not provided."}</dd></div>
           <div><dt className="font-medium">Learning goals</dt><dd className="mt-1 whitespace-pre-line text-muted-foreground">{exchange.notes || "Not provided."}</dd></div>
         </dl>
-      </section>
+      </details>
       {sessionsError ? <p role="alert" className="text-destructive">Could not load sessions. Please reload to try again. On a new setup, run the prompt 3 SQL first.</p> : <ExchangeSessionList exchangeId={id} sessions={sessions} teachers={teachers} editable={editable} />}
       {(exchange.status === "scheduled" || exchange.status === "completed") && <section className="space-y-3 surface-card p-5">
         <h2 className="text-lg font-semibold">Completion confirmations</h2>

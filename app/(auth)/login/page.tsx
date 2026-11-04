@@ -12,8 +12,8 @@ async function LoginNotice({ searchParams }: { searchParams: Promise<Record<stri
 export default function LoginPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
     return (
         <Card>
-            <CardHeader className="flex flex-col items-center text-center">
-                <CardTitle><h1 className="text-3xl font-semibold tracking-tight">Welcome back.</h1></CardTitle>
+            <CardHeader className="flex flex-col items-start">
+                <CardTitle><h1 className="page-heading">Welcome back.</h1></CardTitle>
                 <CardDescription>Log in to continue to MMXchange.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

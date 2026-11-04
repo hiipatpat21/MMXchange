@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoadingState } from "@/components/ui/loading-state";
+import { PageIntro } from "@/components/layout/page-intro";
 
 async function Forum({ searchParams }: { searchParams: Promise<ForumQuery> }) {
   const parsed = forumFilterSchema.safeParse(await searchParams);
@@ -24,7 +25,7 @@ async function Forum({ searchParams }: { searchParams: Promise<ForumQuery> }) {
   const { data, error } = await request.range((page - 1) * 20, page * 20);
   const rows = (data ?? []) as ForumPost[];
   return <>
-    <form action="/forum" method="get" className="space-y-4 surface-card p-5">
+    <form action="/forum" method="get" className="space-y-3 filter-panel">
       {category && <input type="hidden" name="category" value={category} />}
       <div className="space-y-2"><Label htmlFor="forum-search">Search titles and posts</Label><Input key={q} id="forum-search" type="search" name="q" maxLength={100} defaultValue={q} placeholder="Search a question or resource…" /></div>
       <div className="flex flex-wrap items-center gap-4"><Label htmlFor="forum-mine" className="flex min-h-11 cursor-pointer items-center gap-2"><input key={String(mine)} id="forum-mine" type="checkbox" name="mine" value="1" defaultChecked={mine} className="size-4 accent-primary" />My posts</Label><Button type="submit" variant="outline">Apply filters</Button><Link className="inline-flex min-h-11 items-center text-sm text-primary underline" href="/forum">Clear filters</Link></div>
@@ -36,5 +37,5 @@ async function Forum({ searchParams }: { searchParams: Promise<ForumQuery> }) {
 }
 
 export default function ForumPage({ searchParams }: { searchParams: Promise<ForumQuery> }) {
-  return <div className="mx-auto max-w-3xl space-y-6"><header className="flex flex-wrap items-center justify-between gap-4"><div className="space-y-2"><h1 className="page-heading">Learning forum</h1><p className="text-muted-foreground">Questions, explanations, and resources from students.</p></div><Button asChild><Link href="/forum/new">Create post</Link></Button></header><Suspense fallback={<LoadingState label="Loading forum…" />}><Forum searchParams={searchParams} /></Suspense></div>;
+  return <div className="mx-auto max-w-3xl space-y-6"><PageIntro title="Good questions belong here" description="Ask, explain, or share a resource that made something click."><Button asChild><Link href="/forum/new">Start a discussion</Link></Button></PageIntro><Suspense fallback={<LoadingState label="Loading forum…" />}><Forum searchParams={searchParams} /></Suspense></div>;
 }

@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { exchangeSelect, type ExchangeRow } from "@/lib/exchanges";
 import { ExchangeCard } from "@/components/exchanges/exchange-card";
 import { Button } from "@/components/ui/button";
+import { PageIntro } from "@/components/layout/page-intro";
 
 const tabs = ["incoming", "outgoing", "active", "past"] as const;
 const labels = { incoming: "Incoming", outgoing: "Outgoing", active: "Active", past: "Past" };
@@ -46,8 +47,8 @@ async function ExchangeList({ searchParams }: { searchParams: SearchParams }) {
   const exchanges = (list.data ?? []) as ExchangeRow[];
   return (
     <div className="space-y-5">
-      <nav aria-label="Exchange filters" className="flex flex-wrap gap-2">
-        {tabs.map((key) => <Button key={key} asChild variant={tab === key ? "default" : "outline"} className="min-h-11"><Link href={`/exchanges?tab=${key}`} aria-current={tab === key ? "page" : undefined}>{labels[key]} ({counts[key]})</Link></Button>)}
+      <nav aria-label="Exchange filters" className="section-tabs">
+        {tabs.map((key) => <Link key={key} href={`/exchanges?tab=${key}`} aria-current={tab === key ? "page" : undefined}>{labels[key]} <span className="ml-2 tabular-nums text-muted-foreground">{counts[key]}</span></Link>)}
       </nav>
       {exchanges.length ? (
         <div className="grid gap-4 lg:grid-cols-2">{exchanges.map((exchange) => <ExchangeCard key={exchange.id} exchange={exchange} userId={user.id} />)}</div>
@@ -68,7 +69,7 @@ async function ExchangeList({ searchParams }: { searchParams: SearchParams }) {
 export default function ExchangesPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="space-y-6">
-      <header><h1 className="page-heading">Your exchanges</h1><p className="mt-1 text-muted-foreground">Review requests and follow your one-on-one learning exchanges.</p></header>
+      <PageIntro title="A skill for a skill" description="Your requests, your partners, and the things you’re learning together." />
       <Suspense fallback={<LoadingState label="Loading exchanges..." />}><ExchangeList searchParams={searchParams} /></Suspense>
     </div>
   );

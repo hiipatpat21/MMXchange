@@ -11,7 +11,7 @@ export function SessionCard({ session, registrationBadge }: { session: SessionCa
   return (
     <Link
       href={`/sessions/${session.id}`}
-      className="block min-w-0 break-words surface-card p-5 transition-shadow hover:border-primary/25 hover:shadow-sm focus-visible:outline-2 focus-visible:outline-primary"
+      className="block min-w-0 break-words surface-card p-5 transition-colors hover:border-primary/25 focus-visible:outline-2 focus-visible:outline-primary"
     >
       <div className="flex flex-wrap gap-2">
         {session.skillName && <Badge variant="secondary" className="h-auto max-w-full whitespace-normal py-1">{session.skillName}</Badge>}

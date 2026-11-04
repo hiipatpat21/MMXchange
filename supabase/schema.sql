@@ -953,3 +953,44 @@ $$;
 revoke execute on function public.notify_forum_reply() from public, anon, authenticated;
 drop trigger if exists notify_forum_reply on public.forum_comments;
 create trigger notify_forum_reply after insert on public.forum_comments for each row execute function public.notify_forum_reply();
+
+-- Prompt 12: least privilege for the baseline schema and private read receipts.
+revoke all on public.skills, public.profiles, public.profile_skills,
+  public.group_sessions, public.group_session_registrations from public, anon, authenticated;
+grant select on public.skills to anon, authenticated;
+grant select on public.profiles to authenticated;
+grant update (display_name, college, program, year_level, bio, avatar_url) on public.profiles to authenticated;
+grant select, insert, delete on public.profile_skills to authenticated;
+grant select, insert on public.group_sessions to authenticated;
+grant select, delete on public.group_session_registrations to authenticated;
+-- The existing mark_exchange_read function is the only receipt writer.
+revoke insert, update on public.exchange_message_reads from public, anon, authenticated;
+revoke update (last_read_at) on public.exchange_message_reads from public, anon, authenticated;
+drop policy if exists "Insert own conversation receipts" on public.exchange_message_reads;
+drop policy if exists "Update own conversation receipts" on public.exchange_message_reads;
+create index if not exists group_sessions_skill_idx on public.group_sessions(skill_id);
+
+-- Do not derive a public name from an email address or trust unlimited metadata.
+create or replace function public.handle_new_user()
+returns trigger language plpgsql security definer set search_path = '' as $$
+declare v_name text := left(btrim(coalesce(new.raw_user_meta_data ->> 'display_name','')),50);
+begin
+  if char_length(v_name) < 2 then v_name := 'Student'; end if;
+  insert into public.profiles(id,display_name) values (new.id,v_name);
+  return new;
+end;
+$$;
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+
+-- NOT VALID preserves existing rows; new/updated rows must meet these limits.
+do $$ begin
+  if not exists (select 1 from pg_constraint where conrelid = 'public.profiles'::regclass and conname = 'profiles_public_text_limits') then
+    alter table public.profiles add constraint profiles_public_text_limits check (
+      char_length(btrim(display_name)) between 2 and 50
+      and (college is null or char_length(college) <= 100)
+      and (program is null or char_length(program) <= 100)
+      and (bio is null or char_length(bio) <= 300)
+      and (avatar_url is null or char_length(avatar_url) <= 500)
+    ) not valid;
+  end if;
+end $$;

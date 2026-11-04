@@ -4,8 +4,8 @@ import { Logo } from "@/components/layout/logo"
 
 export default function PublicLayout ({children}: {children: React.ReactNode}) {
     return (
-        <div className="flex min-h-screen flex-col">
-            <header className="border-b bg-card">
+        <div className="public-page flex min-h-screen flex-col">
+            <header className="bg-card">
                 <div className="mx-auto flex min-h-20 max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6">
                     <Link href="/" aria-label="MMXchange home" className="inline-flex min-h-11 items-center rounded-lg">
                         <Logo />

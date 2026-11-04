@@ -8,8 +8,8 @@ export async function RecommendedMatches() {
   try { result = await getDashboardMatches(); }
   catch { return <DashboardError title="Recommended matches" />; }
   return (
-    <DashboardSection title="Recommended matches" href="/discover" actionLabel="See all">
-      {!result.hasSkills ? <DashboardEmpty message="Add teaching and learning skills to find potential partners." href="/skills" label="Add your skills" /> : !result.matches.length ? <DashboardEmpty message="No matching students yet. Group sessions offer another way to learn." href="/sessions" label="Browse group sessions" /> : <div className="space-y-3">{result.matches.map((match) => <MatchCard key={match.profile.id} match={match} compact />)}</div>}
+    <DashboardSection title="People to learn with" href="/discover" actionLabel="Explore">
+      {!result.hasSkills ? <DashboardEmpty message="A skill you share could start a great exchange." href="/skills" label="Add your skills" /> : !result.matches.length ? <DashboardEmpty message="No skill matches yet. Try a group session while your community grows." href="/sessions" label="Explore sessions" /> : <div className="space-y-2">{result.matches.slice(0, 2).map((match) => <MatchCard key={match.profile.id} match={match} compact />)}</div>}
     </DashboardSection>
   );
 }

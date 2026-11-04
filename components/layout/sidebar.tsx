@@ -4,11 +4,10 @@ import Link from "next/link"
 
 export function Sidebar () {
     return (
-        <aside aria-label="Main navigation" className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col gap-8 border-r bg-card px-4 py-6 md:flex lg:w-64">
+        <aside aria-label="Main navigation" className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col gap-6 overflow-y-auto px-4 py-6 lg:flex">
             <Link href="/dashboard" aria-label="MMXchange dashboard" className="rounded-xl px-2 focus-visible:outline-2 focus-visible:outline-primary"><Logo /></Link>
-            <p className="px-3 text-xs font-semibold tracking-widest text-muted-foreground">YOUR WORKSPACE</p>
             <NavLinks />
-            <div className="mt-auto border-t px-3 pt-5"><p className="text-sm font-medium">A little knowledge goes a long way.</p><p className="mt-1 text-xs text-muted-foreground">Learn and share with fellow students.</p></div>
+            <div className="mt-auto px-3 pt-6"><p className="text-sm font-medium">A little give. A little grow.</p><p className="mt-2 text-xs text-muted-foreground">Your skills could be someone else&apos;s next discovery.</p></div>
         </aside>
     )
 

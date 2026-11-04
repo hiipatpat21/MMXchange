@@ -19,11 +19,11 @@ import { NotificationBell } from "@/components/notifications/notification-bell";
 
 export function Topbar({ displayName, avatarUrl, profileError, unreadCount, notifications, notificationsError }: { displayName: string; avatarUrl: string | null; profileError: boolean; unreadCount: number | null; notifications: NotificationItem[]; notificationsError: boolean }) {
   return (
-    <header className="sticky top-0 z-30 flex h-18 shrink-0 items-center justify-between gap-3 border-b bg-card px-4 sm:px-6 lg:px-10">
+    <header className="flex h-16 shrink-0 items-center justify-between gap-3 bg-background px-4 sm:px-6 lg:px-8">
       <div className="flex min-w-0 items-center gap-2">
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
+          <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
             <Menu className="size-5" />
           </Button>
         </SheetTrigger>
@@ -35,7 +35,7 @@ export function Topbar({ displayName, avatarUrl, profileError, unreadCount, noti
           </div>
         </SheetContent>
       </Sheet>
-      <p className="truncate text-sm font-medium text-muted-foreground">Your learning space</p>
+      <Link href="/dashboard" className="inline-flex min-h-11 items-center text-sm text-muted-foreground">MMXchange <span className="ml-2 hidden sm:inline">/ Your learning space</span></Link>
       </div>
 
       <div className="flex items-center gap-2">

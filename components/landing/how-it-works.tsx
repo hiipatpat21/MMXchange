@@ -1,24 +1,17 @@
-import { Search, Users, ArrowLeftRight, BookOpen, TrendingUp } from "lucide-react";
-
 const steps = [
-    { title: "Find", text: "List what you can teach and what you want to learn.", icon: Search },
-    { title: "Match", text: "See students whose skills complement yours.", icon: Users },
-    { title: "Swap", text: "Send a request and agree on what to exchange.", icon: ArrowLeftRight },
-    { title: "Learn", text: "Meet up in person or online and teach each other.", icon: BookOpen },
-    { title: "Grow", text: "Keep learning and host a group session of your own.", icon: TrendingUp },
+    { title: "Bring what you know", text: "Add skills you can teach and a few you’re curious about." },
+    { title: "Find your people", text: "Meet a partner with complementary skills, or pick a group session." },
+    { title: "Make it happen", text: "Plan a time, learn together, and share how it went." },
 ]
 export function HowItWorks() {
     return (
-        <section className="border-y bg-card py-20">
+        <section className="bg-secondary/60 py-16">
             <div className="mx-auto max-w-6xl px-4">
-                <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">A simple way to learn together.</h2>
-                <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
-                    {steps.map(({ title, text, icon: Icon }) => (
-                        <div key={title} className="surface-card p-5">
-                            <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                                <Icon className="size-5" />
-                            </div>
-                            <h3 className="mt-4 font-semibold">{title}</h3>
+                <h2 className="max-w-lg text-3xl font-semibold tracking-tight sm:text-4xl">Start with a little curiosity.</h2>
+                <div className="mt-10 grid gap-8 md:grid-cols-3">
+                    {steps.map(({ title, text }) => (
+                        <div key={title}>
+                            <h3 className="text-xl font-medium">{title}</h3>
                             <p className="mt-1 text-sm text-muted-foreground">{text}</p>
                         </div>
                     ))}

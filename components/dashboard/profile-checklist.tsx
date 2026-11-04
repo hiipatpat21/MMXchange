@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getDashboardContext } from "@/lib/dashboard";
-import { DashboardSection, DashboardError } from "@/components/dashboard/dashboard-section";
+import { DashboardError } from "@/components/dashboard/dashboard-section";
 
 export async function ProfileChecklist() {
   const { supabase, user } = await getDashboardContext();
@@ -18,9 +18,6 @@ export async function ProfileChecklist() {
   ].filter((item) => !item.done);
   if (!missing.length) return null;
   return (
-    <DashboardSection title="Complete your profile">
-      <p className="text-sm text-muted-foreground">Help other students understand what you want to learn and share.</p>
-      <ul className="space-y-2">{missing.map((item) => <li key={item.label}><Link href={item.href} className="flex min-h-11 items-center gap-3 rounded-lg px-2 text-sm text-primary underline-offset-4 hover:bg-muted hover:underline focus-visible:outline-2 focus-visible:outline-primary"><span aria-hidden="true" className="size-4 shrink-0 rounded border" />{item.label}</Link></li>)}</ul>
-    </DashboardSection>
+    <aside className="flex flex-wrap items-center justify-between gap-x-4 rounded-xl bg-brand-gold/15 px-4 py-2 text-sm text-primary" aria-label="Profile suggestion"><p>A little more about you helps partners connect.</p><Link href={missing[0].href} className="inline-flex min-h-11 items-center font-medium underline underline-offset-4">{missing[0].label} <span aria-hidden="true" className="ml-2">→</span></Link></aside>
   );
 }
