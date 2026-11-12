@@ -16,12 +16,13 @@ export function StudentIdentity({ student, heading = "h3" }: { student: Pick<Stu
   );
 }
 
-export function StudentCard({ student }: { student: StudentProfile }) {
+export function StudentCard({ student, children }: { student: StudentProfile; children?: React.ReactNode }) {
   return (
     <article className="min-w-0 space-y-4 surface-card p-5 transition-colors hover:border-primary/25">
       <StudentIdentity student={student} />
       {student.bio && <p className="line-clamp-3 break-words text-sm text-muted-foreground">{student.bio}</p>}
       <Button asChild variant="outline" className="min-h-11"><Link href={`/students/${student.id}`}>View profile<span className="sr-only"> of {student.display_name}</span></Link></Button>
+      {children}
     </article>
   );
 }

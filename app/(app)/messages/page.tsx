@@ -1,3 +1,5 @@
+import { z } from "zod";
+import { PaidLessonList } from "@/components/lessons/lesson-list";
 import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
@@ -29,6 +31,11 @@ async function Conversations({ searchParams }: { searchParams: Promise<{ page?: 
   </>;
 }
 
-export default function MessagesPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
-  return <div className="mx-auto max-w-3xl space-y-6"><PageIntro title="Keep the conversation going" description="Plan your next exchange in a private conversation. Refresh for new messages."><RefreshButton /></PageIntro><Suspense fallback={<LoadingState label="Loading conversations…" />}><Conversations searchParams={searchParams} /></Suspense></div>;
+async function PaidConversations({ searchParams }: { searchParams: Promise<{ lessonPage?: string }> }) {
+  const page = z.coerce.number().int().min(1).max(10000).safeParse((await searchParams).lessonPage ?? 1);
+  return <PaidLessonList conversations page={page.success ? page.data : 1} />;
+}
+
+export default function MessagesPage({ searchParams }: { searchParams: Promise<{ page?: string; lessonPage?: string }> }) {
+  return <div className="mx-auto max-w-3xl space-y-6"><PageIntro title="Keep the conversation going" description="Plan your learning in a private conversation. Refresh for new messages."><RefreshButton /></PageIntro><Suspense fallback={<LoadingState label="Loading conversations…" />}><Conversations searchParams={searchParams} /></Suspense><Suspense fallback={<LoadingState label="Loading paid conversations..." />}><PaidConversations searchParams={searchParams} /></Suspense></div>;
 }

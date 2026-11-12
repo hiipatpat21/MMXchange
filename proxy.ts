@@ -8,6 +8,7 @@ const protectedPaths = [
   "/students",
   "/sessions",
   "/exchanges",
+  "/lessons",
   "/messages",
   "/forum",
   "/notifications",

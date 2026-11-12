@@ -19,6 +19,7 @@ const requestSchema = z.object({
 });
 
 const rejectionMessages: Record<string, string> = {
+  not_complementary: "Your selected skills no longer match both learning lists. Reload the profile; without a mutual match, a paid offering is required.",
   not_logged_in: "Please sign in to continue.",
   self_request: "Choose another student for an exchange.",
   recipient_not_found: "This student could not be found. Choose someone from Discover.",

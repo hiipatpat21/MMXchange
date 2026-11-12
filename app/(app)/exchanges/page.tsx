@@ -1,3 +1,4 @@
+import { PaidLessonList } from "@/components/lessons/lesson-list";
 import { LoadingState } from "@/components/ui/loading-state";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -66,11 +67,17 @@ async function ExchangeList({ searchParams }: { searchParams: SearchParams }) {
   );
 }
 
+async function PaidLessons({ searchParams }: { searchParams: SearchParams }) {
+  const page = z.coerce.number().int().min(1).max(10000).safeParse((await searchParams).lessonPage ?? 1);
+  return <PaidLessonList page={page.success ? page.data : 1} />;
+}
+
 export default function ExchangesPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="space-y-6">
-      <PageIntro title="A skill for a skill" description="Your requests, your partners, and the things you’re learning together." />
+      <PageIntro title="My learning" description="Your free skill swaps and paid individual lessons." />
       <Suspense fallback={<LoadingState label="Loading exchanges..." />}><ExchangeList searchParams={searchParams} /></Suspense>
+      <Suspense fallback={<LoadingState label="Loading paid lessons..." />}><PaidLessons searchParams={searchParams} /></Suspense>
     </div>
   );
 }

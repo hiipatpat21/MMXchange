@@ -1,3 +1,4 @@
+import { OfferSettings } from "@/components/lessons/offer-settings";
 import { LoadingState } from "@/components/ui/loading-state";
 import { Suspense } from "react";
 import { SkillsLoader } from "@/components/skills/skills-loader";
@@ -10,6 +11,7 @@ export default function SkillsPage() {
       <Suspense fallback={<LoadingState label="Loading your skills..." />}>
         <SkillsLoader />
       </Suspense>
+      <Suspense fallback={<LoadingState label="Loading paid teaching offers..." />}><OfferSettings /></Suspense>
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import { LearningOptions } from "@/components/lessons/learning-options";
+import { loadLearningOptions } from "@/lib/paid-lessons";
 import { LoadingState } from "@/components/ui/loading-state";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -27,21 +29,15 @@ async function Recommendations({ supabase, userId }: { supabase: Awaited<ReturnT
     return <p role="alert" className="text-destructive">Could not load recommendations. Please reload to try again.</p>;
   }
   const { hasSkills, matches } = result;
-    if (!hasSkills) return (
-      <div className="rounded-xl border border-dashed p-6">
-        <p className="font-medium">Add skills to find learning partners</p>
-        <p className="mt-1 text-sm text-muted-foreground">Tell us what you can teach and what you want to learn to get recommendations.</p>
-        <Button asChild className="mt-4 min-h-11"><Link href="/skills">Add your skills</Link></Button>
-      </div>
-    );
-    if (!matches.length) return (
-      <div className="rounded-xl border border-dashed p-6">
-        <p className="font-medium">No matching students yet</p>
-        <p className="mt-1 text-sm text-muted-foreground">Try adding more skills, or explore group sessions for another way to learn.</p>
-        <Button asChild variant="outline" className="mt-4 min-h-11"><Link href="/sessions">Browse group sessions</Link></Button>
-      </div>
-    );
-    return <div className="grid gap-4 lg:grid-cols-2">{matches.map((match) => <MatchCard key={match.profile.id} match={match} />)}</div>;
+  if (!hasSkills || !matches.length) return <div className="space-y-4">
+    <p>You can browse tutors without adding skills. Free swaps need matching skills in both directions; paid offerings do not require a return skill.</p>
+    <BrowseStudents supabase={supabase} userId={userId} searchParams={Promise.resolve({})} />
+  </div>;
+  let options: Awaited<ReturnType<typeof loadLearningOptions>>;
+  try { options = await loadLearningOptions(supabase, userId, matches.map(match => match.profile.id)); }
+  catch { return <p role="alert">Could not load learning options. Apply Teacher Prompt 3 SQL on a new deployment, then reload.</p>; }
+  return <div className="grid gap-4 lg:grid-cols-2">{matches.map(match => <MatchCard key={match.profile.id} match={match} options={options.get(match.profile.id)} skillNames={Object.fromEntries([...match.teachesMe,...match.iTeachThem].map(skill => [skill.id,skill.name]))} />)}</div>;
+
 }
 
 async function BrowseStudents({ supabase, userId, searchParams }: { supabase: Awaited<ReturnType<typeof createClient>>; userId: string; searchParams: SearchParams }) {
@@ -66,13 +62,17 @@ async function BrowseStudents({ supabase, userId, searchParams }: { supabase: Aw
   if (filters.skill) query = query.eq("profile_skills.skill_id", Number(filters.skill));
   const { data, error } = await query.order("created_at", { ascending: false }).order("id").limit(30);
   const students = data ?? [];
+  let options: Awaited<ReturnType<typeof loadLearningOptions>>;
+  try { options = await loadLearningOptions(supabase, userId, students.map(row => row.id)); }
+  catch { return <p role="alert">Could not load learning options. Apply Teacher Prompt 3 SQL on a new deployment, then reload.</p>; }
+  const skillNames = Object.fromEntries((skills ?? []).map(skill => [skill.id,skill.name]));
   return (
     <div className="space-y-4">
       <StudentFiltersForm filters={filters} skills={skills} />
       {error ? <p role="alert" className="text-destructive">Could not load students. Please reload to try again.</p> : students.length ? (
         <>
           <p className="text-sm text-muted-foreground">Showing up to 30 students, newest profiles first.</p>
-          <div className="grid gap-4 lg:grid-cols-2">{students.map((student) => <StudentCard key={student.id} student={student} />)}</div>
+          <div className="grid gap-4 lg:grid-cols-2">{students.map((student) => <StudentCard key={student.id} student={student}>{options.get(student.id) && <LearningOptions tutorId={student.id} options={options.get(student.id)!} skillNames={skillNames} />}</StudentCard>)}</div>
         </>
       ) : (
         <div className="rounded-xl border border-dashed p-6">
@@ -111,7 +111,7 @@ async function DiscoverContent({ searchParams }: { searchParams: SearchParams })
 export default function DiscoverPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="space-y-8">
-      <PageIntro title="Find your learning people" description="You know something they want to learn. They might know your next favorite skill." />
+      <PageIntro title="Find your learning people" description="Find a complementary skill swap or explore paid teaching offers. Skills are optional for learners." />
       <Suspense fallback={<LoadingState label="Loading discovery..." />}><DiscoverContent searchParams={searchParams} /></Suspense>
     </div>
   );

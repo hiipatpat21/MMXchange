@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { pickOne } from "@/lib/relations";
+import { loadLearningOptions } from "@/lib/paid-lessons";
 import { ExchangeForm } from "@/components/exchanges/exchange-form";
 import { Button } from "@/components/ui/button";
 
@@ -22,18 +22,15 @@ async function RequestLoader({ searchParams }: { searchParams: SearchParams }) {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) redirect("/login");
   if (recipientId.data === user.id) return <RequestNotice>You cannot request an exchange with yourself. Choose another student.</RequestNotice>;
-  const [recipientResult, mineResult, theirsResult] = await Promise.all([
-    supabase.from("profiles").select("id, display_name").eq("id", recipientId.data).maybeSingle(),
-    supabase.from("profile_skills").select("skill_id, skills(name)").eq("profile_id", user.id).eq("kind", "teach").order("skill_id"),
-    supabase.from("profile_skills").select("skill_id, skills(name)").eq("profile_id", recipientId.data).eq("kind", "teach").order("skill_id"),
-  ]);
-  if (recipientResult.error || mineResult.error || theirsResult.error) return <p role="alert" className="text-destructive">Could not load the request form. Please reload to try again.</p>;
-  if (!recipientResult.data) return <RequestNotice>This student could not be found. Choose another student.</RequestNotice>;
-  const namedSkills = (rows: NonNullable<typeof mineResult.data>) => rows.map((row) => ({ id: row.skill_id as number, name: pickOne<{ name: string }>(row.skills)?.name ?? "Unnamed skill" })).sort((a, b) => a.name.localeCompare(b.name));
-  const teachSkills = namedSkills(mineResult.data ?? []);
-  const learnSkills = namedSkills(theirsResult.data ?? []);
-  if (!teachSkills.length) return <RequestNotice href="/skills" action="Add teaching skills">Add a skill you can teach before requesting a mutual exchange.</RequestNotice>;
-  if (!learnSkills.length) return <RequestNotice>This student has no teaching skills listed yet. Try another student.</RequestNotice>;
+  const recipientResult = await supabase.from("profiles").select("id, display_name").eq("id", recipientId.data).maybeSingle();
+  if (recipientResult.error) return <p role="alert">Could not load this student. Reload to try again.</p>;
+  if (!recipientResult.data) return <RequestNotice>This student could not be found.</RequestNotice>;
+  let options;
+  try { options = (await loadLearningOptions(supabase,user.id,[recipientId.data])).get(recipientId.data); }
+  catch { return <p role="alert">Could not check complementary skills. Apply Teacher Prompt 3 SQL on a new deployment, then reload.</p>; }
+  if (!options?.mutual) return <RequestNotice href={`/students/${recipientId.data}`} action="View learning options">A free swap requires skills you both want to learn from each other. Unrelated teaching skills do not qualify. Check this tutor&apos;s paid offerings instead.</RequestNotice>;
+  const teachSkills = options.iTeachThem;
+  const learnSkills = options.teachesMe;
   const initialSkill = (value: string | string[] | undefined, choices: { id: number }[]) => {
     const parsed = z.coerce.number().int().positive().max(Number.MAX_SAFE_INTEGER).safeParse(value);
     return parsed.success && choices.some((skill) => skill.id === parsed.data) ? parsed.data : undefined;

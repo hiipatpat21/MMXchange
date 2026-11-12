@@ -1,3 +1,5 @@
+import { LearningOptions } from "@/components/lessons/learning-options";
+import { loadLearningOptions, type PairOptions } from "@/lib/paid-lessons";
 import { LoadingState } from "@/components/ui/loading-state";
 import { ProfileReviews } from "@/components/feedback/profile-reviews";
 import Link from "next/link";
@@ -22,13 +24,21 @@ async function StudentProfile({ params }: { params: Promise<{ id: string }> }) {
   if (!profile) notFound();
   const { data: rows, error: skillsError } = await supabase.from("profile_skills").select("skill_id, kind, skills(name)").eq("profile_id", id).order("skill_id");
   const ownProfile = user.id === id;
+  let options: PairOptions | undefined;
+  let optionsError = false;
+  if (!ownProfile) {
+    try { options = (await loadLearningOptions(supabase,user.id,[id])).get(id); }
+    catch { optionsError = true; }
+  }
+  const skillNames = Object.fromEntries((rows ?? []).map(row => [row.skill_id,pickOne<{name:string}>(row.skills)?.name ?? "Skill"]));
   return (
     <article className="mx-auto max-w-2xl space-y-6">
       <h1 className="page-heading">Student profile</h1>
       <div className="space-y-4 surface-card p-5">
         <StudentIdentity student={profile} heading="h2" />
         <p className="whitespace-pre-line break-words text-muted-foreground">{profile.bio || "No introduction added yet."}</p>
-        <Button asChild className="min-h-11"><Link href={ownProfile ? "/profile" : `/exchanges/new?to=${id}`}>{ownProfile ? "Edit profile" : "Request exchange"}</Link></Button>
+        {ownProfile ? <Button asChild className="min-h-11"><Link href="/profile">Edit profile</Link></Button> : optionsError ? <p role="alert">Could not load learning options. Apply Teacher Prompt 3 SQL on a new deployment, then reload.</p> : options && <LearningOptions tutorId={id} options={options} skillNames={skillNames} />}
+
       </div>
       {skillsError ? <p role="alert" className="text-destructive">Could not load this student&apos;s skills. Please reload to try again.</p> : ([{ kind: "teach", title: "Can teach" }, { kind: "learn", title: "Wants to learn" }].map((group) => {
         const skills = (rows ?? []).filter((row) => row.kind === group.kind);
