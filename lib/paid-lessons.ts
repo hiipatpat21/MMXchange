@@ -2,8 +2,8 @@ import { z } from "zod";
 import { pickOne } from "@/lib/relations";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-// Flip only in Prompt 5 after database scheduling/payment controls pass hosted checks.
-export const PAID_BOOKING_READY = false;
+// The database rollout switch remains authoritative for new requests.
+export const PAID_BOOKING_READY = true;
 export type LessonState = { error?: string; message?: string } | null;
 export type PaidOffer = { id: string; tutor_id: string; skill_id: number; price_centavos: number; enabled: boolean; skill_name?: string };
 export type PairOptions = { mutual: boolean; teachesMe: { id: number; name: string }[]; iTeachThem: { id: number; name: string }[]; offers: PaidOffer[]; ready: boolean };
@@ -29,6 +29,8 @@ export function formatPhp(value: number) {
 export const lessonErrors: Record<string, string> = {
   not_authenticated: "Please sign in again.", setup_required: "Both students must finish profile setup first.",
   invalid_input: "Check your details and try again.", not_found: "This lesson or offering is unavailable.",
+  payment_method_required: "The tutor needs to upload a GCash QR in My skills before reserving this lesson.",
+  payment_closed: "The payment status changed. Refresh this lesson before trying again.",
   not_teaching: "The tutor no longer lists that teaching skill. Reload to choose another offering.",
   offer_unavailable: "This offering has been withdrawn. Reload to choose another tutor.",
   self_request: "Choose another tutor.", mutual_use_swap: "Your skills now match in both directions. Request a free skill swap instead.",

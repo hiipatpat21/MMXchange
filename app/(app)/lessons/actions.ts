@@ -19,7 +19,7 @@ export async function savePaidOffer(_previous: LessonState, form: FormData): Pro
   const { data, error } = await client.rpc("save_paid_lesson_offer", { p_skill: parsed.data.skill, p_price: parsePhp(parsed.data.price), p_enabled: parsed.data.enabled === "on" });
   const result = lessonResult(data, error);
   if (!result?.error) { refresh(); revalidatePath(`/students/${user.id}`); }
-  return result?.error ? result : { message: "Offering saved. Paid requests remain closed until scheduling and payment setup is ready." };
+  return result?.error ? result : { message: "Offering saved. Add your GCash QR before reserving paid lessons." };
 }
 export async function requestPaidLesson(_previous: LessonState, form: FormData): Promise<LessonState> {
   const parsed = z.object({ offer: z.string().uuid(), price: centavos, message: z.string().trim().min(10).max(500) }).safeParse({ offer: form.get("offer"), price: form.get("price"), message: form.get("message") });

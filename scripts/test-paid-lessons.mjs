@@ -21,7 +21,7 @@ const reader={from:table=>{const query={select:()=>query,in:()=>query,eq:()=>que
 let options=(await lib.loadLearningOptions(reader,a,[b])).get(b);
 assert.equal(options.mutual,true);assert.equal(options.teachesMe[0].id,2);assert.equal(options.iTeachThem[0].id,1);
 options=(await lib.loadLearningOptions(reader,c,[b])).get(b);
-assert.equal(options.mutual,false);assert.equal(options.offers.length,1);assert.equal(options.ready,false);
+assert.equal(options.mutual,false);assert.equal(options.offers.length,1);assert.equal(options.ready,true);
 skillRows.push({profile_id:c,skill_id:3,kind:"teach",skills:{name:"Guitar"}});
 assert.equal((await lib.loadLearningOptions(reader,c,[b])).get(b).mutual,false);
 queryFailed=true;await assert.rejects(lib.loadLearningOptions(reader,a,[b]));queryFailed=false;
@@ -30,7 +30,7 @@ const calls=[],invalidated=[];
 const client={auth:{getUser:async()=>({data:{user:signedIn?{id:a}:null}})},rpc:async(name,args)=>{calls.push({name,args});return {data:code,error:failed?{}:null};}};
 function actions(ready=lib.PAID_BOOKING_READY) {return load("app/(app)/lessons/actions.ts",{"@/lib/paid-lessons":{...lib,PAID_BOOKING_READY:ready},"@/lib/supabase/server":{createClient:async()=>client},"next/cache":{revalidatePath:(...args)=>invalidated.push(args)},"next/navigation":{redirect:route=>{throw new Error(`REDIRECT:${route}`)}}});}
 const form=values=>{const data=new FormData();for(const[key,value]of Object.entries(values))data.set(key,value);return data;};
-const act=actions();
+const act=actions(false);
 assert.ok((await act.savePaidOffer(null,form({skill:2,price:"1.001",enabled:"on"}))).error);assert.equal(calls.length,0);
 assert.ok((await act.savePaidOffer(null,form({skill:2,price:"250.50",enabled:"on",tutor_id:b}))).message);
 assert.equal(calls.at(-1).args.p_price,25050);assert.equal("tutor_id" in calls.at(-1).args,false);

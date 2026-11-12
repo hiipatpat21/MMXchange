@@ -13,18 +13,21 @@ try {
  grant usage on schema auth to anon,authenticated;
  create schema storage;
  create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
- create table storage.objects(id uuid default gen_random_uuid(),bucket_id text,name text);
+ create table storage.objects(id uuid default gen_random_uuid(),bucket_id text,name text,metadata jsonb,unique(bucket_id,name));
  alter table storage.objects enable row level security;
  create function storage.foldername(name text) returns text[] language sql immutable as $$select string_to_array(name,'/')$$;
  grant usage on schema storage to anon,authenticated;`);
  for(const file of ['lib/supabase/schema.sql','supabase/schema.sql']) { await db.exec(readFileSync(file,'utf8'));console.log('Applied locally: '+file); }
  await db.exec(readFileSync('supabase/migrations/20261113_teacher_prompt_4_availability.sql','utf8'));
  console.log('Prompt 4 rerun succeeded.');
+ await db.exec(readFileSync('supabase/migrations/20261113_teacher_prompt_5_payments.sql','utf8'));
+ await db.exec(readFileSync('supabase/migrations/20261113_teacher_prompt_5_payments.sql','utf8'));
+ console.log('Prompt 5 applied and rerun succeeded.');
  await db.exec(`insert into auth.users(id,raw_user_meta_data) values
  ('11111111-1111-4111-8111-111111111111','{"display_name":"Test A"}'),
  ('22222222-2222-4222-8222-222222222222','{"display_name":"Test B"}'),
  ('33333333-3333-4333-8333-333333333333','{"display_name":"Test C"}');`);
- for(const file of ['supabase/tests/onboarding-checks.sql','supabase/tests/individual-lessons-checks.sql','supabase/tests/availability-checks.sql','supabase/tests/security-checks.sql']) {
+ for(const file of ['supabase/tests/onboarding-checks.sql','supabase/tests/individual-lessons-checks.sql','supabase/tests/availability-checks.sql','supabase/tests/payment-checks.sql','supabase/tests/security-checks.sql']) {
    const sql=readFileSync(file,'utf8').replaceAll('<USER_A_UUID>','11111111-1111-4111-8111-111111111111').replaceAll('<USER_B_UUID>','22222222-2222-4222-8222-222222222222').replaceAll('<USER_C_UUID>','33333333-3333-4333-8333-333333333333');
    console.log('Testing locally: '+file); await db.exec(sql); console.log('Passed: '+file);
    if(file.endsWith('availability-checks.sql')) {

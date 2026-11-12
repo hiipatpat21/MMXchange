@@ -4,6 +4,8 @@ export type AvailabilityState = { error?: string; message?: string } | null;
 export type WeeklyWindow = { id: string; weekday: number; start_minute: number; end_minute: number };
 export const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 export const availabilityErrors: Record<string, string> = {
+  payment_method_required: "The tutor must upload a GCash QR in My skills before this time can be reserved.",
+  payment_closed: "Refresh this lesson to check the latest payment status.",
   not_authenticated: "Please sign in again.", not_logged_in: "Please sign in again.",
   invalid_input: "Check the day and times and try again.", not_found: "This availability or meeting no longer exists.",
   duplicate_window: "That time window is already saved.", overlapping_window: "That window overlaps your existing hours. Choose another time or remove the old window first.",
