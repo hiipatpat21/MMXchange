@@ -9,6 +9,7 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    ".taste-skill/**", // Generated design inspections and local preview/build artifacts.
     "out/**",
     "build/**",
     "next-env.d.ts",

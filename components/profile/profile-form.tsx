@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { saveSetupProfile } from "@/app/onboarding/actions";
 import { updateProfile } from "@/app/(app)/profile/actions";
 import { colleges } from "@/lib/mmsu-programs";
 import { Button } from "@/components/ui/button";
@@ -17,10 +18,10 @@ type Profile = {
 };
 
 const selectClass =
-  "h-11 w-full rounded-xl border border-input bg-card px-3 text-base sm:text-sm disabled:cursor-not-allowed disabled:opacity-50";
+  "h-11 w-full rounded-xl border border-input bg-card px-3 text-base sm:text-sm disabled:cursor-not-allowed disabled:text-muted-foreground disabled:opacity-100";
 
-export function ProfileForm({ profile }: { profile: Profile }) {
-  const [state, formAction, pending] = useActionState(updateProfile, null);
+export function ProfileForm({ profile, onboarding = false }: { profile: Profile; onboarding?: boolean }) {
+  const [state, formAction, pending] = useActionState(onboarding ? saveSetupProfile : updateProfile, null);
 
   const initialCollege = colleges.some((c) => c.name === profile.college)
     ? (profile.college as string)
@@ -41,6 +42,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         <Label htmlFor="college">College</Label>
         <select
           id="college"
+          required
           name="college"
           value={college}
           onChange={(e) => {
@@ -62,6 +64,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         <Label htmlFor="program">Degree program</Label>
         <select
           id="program"
+          required
           name="program"
           value={program}
           onChange={(e) => setProgram(e.target.value)}
@@ -83,12 +86,13 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         <Label htmlFor="yearLevel">Year level</Label>
         <select
           id="yearLevel"
+          required
           name="yearLevel"
           defaultValue={profile.year_level?.toString() ?? ""}
           className={selectClass}
         >
-          <option value="">Prefer not to say</option>
-          {[1, 2, 3, 4].map((y) => (
+          <option value="">Select your year level</option>
+          {[1, 2, 3, 4, 5, 6].map((y) => (
             <option key={y} value={y}>
               Year {y}
             </option>
@@ -97,7 +101,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
       </div>
 
       <div className="space-y-2 sm:col-span-2">
-        <Label htmlFor="bio">Short introduction</Label>
+        <Label htmlFor="bio">Short introduction (optional)</Label>
         <Textarea id="bio" name="bio" rows={4} maxLength={300} defaultValue={profile.bio ?? ""} />
       </div>
 
@@ -112,7 +116,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         </p>
       )}
       <Button type="submit" disabled={pending} className="justify-self-start sm:col-span-2">
-        {pending ? "Saving..." : "Save profile"}
+        {pending ? "Saving..." : onboarding ? "Save and continue" : "Save profile"}
       </Button>
     </form>
   );

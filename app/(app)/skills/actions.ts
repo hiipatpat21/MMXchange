@@ -32,6 +32,7 @@ export async function addSkill(_previous: SkillState, formData: FormData): Promi
   if (error) return { error: error.code === "23505" ? "That skill is already in one of your lists." : "Could not add this skill. Please try again." };
 
   revalidatePath("/skills");
+  revalidatePath("/onboarding/skills");
   revalidatePath("/dashboard");
   revalidatePath("/discover");
   revalidatePath(`/students/${user.id}`);
@@ -56,6 +57,7 @@ export async function removeSkill(_previous: SkillState, formData: FormData): Pr
   if (error || !data?.length) return { error: "Could not remove this skill. Please refresh and try again." };
 
   revalidatePath("/skills");
+  revalidatePath("/onboarding/skills");
   revalidatePath("/dashboard");
   revalidatePath("/discover");
   revalidatePath(`/students/${user.id}`);

@@ -1,3 +1,4 @@
+import { loadOnboardingStep, onboardingDestination } from "@/lib/onboarding";
 import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
@@ -30,8 +31,17 @@ export async function GET(request: NextRequest) {
     if (!binding) return failure();
     cookieStore.set(recoveryCookieName, binding.value, recoveryCookieOptions);
     destination = "/reset-password";
-  } else if (destination.split(/[?#]/)[0] === "/reset-password") {
-    destination = "/dashboard";
+  } else {
+    if (destination.split(/[?#]/)[0] === "/reset-password") destination = "/dashboard";
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) return failure();
+    try {
+      const step = await loadOnboardingStep(supabase, user.id);
+      if (step !== "complete") destination = onboardingDestination(step);
+    } catch {
+      // Show the setup error screen without losing the confirmed session.
+      destination = "/onboarding";
+    }
   }
   return NextResponse.redirect(new URL(destination, origin));
 }

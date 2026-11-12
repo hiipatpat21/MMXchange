@@ -90,13 +90,13 @@ const { proxy } = load("proxy.ts", {
 });
 const request = pathname => ({ url: `https://app.example${pathname}`, nextUrl: { pathname }, cookies: { getAll: () => [], set: () => {} } });
 signedIn = false;
-for (const root of ["dashboard", "discover", "students", "sessions", "exchanges", "messages", "forum", "notifications", "profile", "skills"]) {
+for (const root of ["onboarding", "dashboard", "discover", "students", "sessions", "exchanges", "messages", "forum", "notifications", "profile", "skills"]) {
   assert.equal((await proxy(request(`/${root}`))).url, "https://app.example/login");
   assert.equal((await proxy(request(`/${root}/${actor}`))).kind, "redirect");
 }
 for (const route of ["/", "/login", "/register", "/forgot-password", "/reset-password", "/auth/callback"]) assert.equal((await proxy(request(route))).kind, "next");
 signedIn = true;
-assert.equal((await proxy(request("/login"))).url, "https://app.example/dashboard");
+assert.equal((await proxy(request("/login"))).url, "https://app.example/onboarding");
 assert.equal((await proxy(request("/reset-password"))).kind, "next");
 let signupPayload;
 const auth = load("app/(auth)/actions.ts", {

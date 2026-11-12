@@ -31,7 +31,7 @@ export async function login(_prev: AuthState, formData: FormData): Promise<AuthS
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) return { error: "Incorrect email or password." };
   (await cookies()).delete(recoveryCookieName);
-  redirect("/dashboard");
+  redirect("/onboarding");
 }
 
 export async function register(_prev: AuthState, formData: FormData): Promise<AuthState> {
@@ -64,7 +64,7 @@ export async function register(_prev: AuthState, formData: FormData): Promise<Au
   // If email confirmation is on, there is no session yet.
   if (!data.session) return { message: "Check your email to confirm your account." };
 
-  redirect("/dashboard");
+  redirect("/onboarding");
 }
 
 export async function logout() {
