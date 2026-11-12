@@ -1,9 +1,10 @@
+import { PaidBookingForm } from "@/components/lessons/booking-form";
 import Link from "next/link";
 import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { paidRequestSelect, loadPaidLessonState, formatPhp, type PaidRequest } from "@/lib/paid-lessons";
+import { paidRequestSelect, PAID_BOOKING_READY, loadPaidLessonState, formatPhp, type PaidRequest } from "@/lib/paid-lessons";
 import { pickOne } from "@/lib/relations";
 import { formatDateTime } from "@/lib/datetime";
 import { LessonAction } from "@/components/lessons/lesson-action";
@@ -35,12 +36,14 @@ async function LessonLoader({ params, searchParams }: Props) {
     <section className="space-y-4 rounded-xl border bg-card p-5"><h2 className="text-lg font-semibold">Your next step</h2>
       <dl className="grid gap-3 sm:grid-cols-3"><div><dt className="text-sm text-muted-foreground">Request</dt><dd>{row.status}</dd></div><div><dt className="text-sm text-muted-foreground">Meeting</dt><dd>{booking.data?.status ?? "Not reserved"}</dd></div><div><dt className="text-sm text-muted-foreground">Payment</dt><dd>{payment.data?.status.replaceAll("_", " ") ?? "Not requested"}</dd></div></dl>
       {row.status === "pending" && <p className="text-sm">{isTutor ? "Review the learner's goals and quoted fee before accepting." : "Waiting for the tutor to review your request."}</p>}
-      {row.status === "accepted" && !booking.data && <p className="text-sm">Accepted only. No meeting or payment is confirmed. Scheduling and payment controls arrive in Prompts 4-5; no payment is due yet.</p>}
+      {row.status === "accepted" && !booking.data && <p className="text-sm">Accepted only. No meeting or payment is confirmed. Shared scheduling is prepared; payment controls arrive in Prompt 5. No payment is due yet.</p>}
       {booking.data && <p>{formatDateTime(booking.data.starts_at)} - {booking.data.format === "online" ? "Online" : "In person"}: <span className="break-words">{booking.data.venue}</span></p>}
+      {booking.data?.status === "reserved" && started && <p role="alert">This unpaid reservation has passed and needs resolution. It is not a completed meeting. Cancel it, or arrange a new shared time when scheduling is available.</p>}
       {ownConfirmation && row.status !== "completed" && <p>Waiting for your learning partner to confirm completion.</p>}
       <div className="flex flex-wrap gap-3">{row.status === "pending" && isTutor && <><LessonAction id={id} action="accept" price={row.quoted_price_centavos} label={`Accept at ${formatPhp(row.quoted_price_centavos)}`} /><LessonAction id={id} action="decline" label="Decline request" /></>}{canCancel && <LessonAction id={id} action="cancel" label="Cancel request" />}{canComplete && <LessonAction id={id} action="complete" label="Confirm lesson completed" />}</div>
       <p className="text-sm text-muted-foreground">The learner may cancel a pending request. After acceptance, either participant may cancel before a confirmed meeting starts. Unpaid reservations can be cancelled even after their time passes. If money was sent, arrange refunds directly; MMXchange does not refund or guarantee payment.</p>
     </section>
+    {PAID_BOOKING_READY && row.status === "accepted" && (!started || booking.data?.status === "reserved") && <details className="disclosure"><summary>{booking.data ? "Reschedule shared time" : "Reserve a shared hour"}</summary><PaidBookingForm id={id} now={now} booking={booking.data} /></details>}
     <details className="disclosure"><summary>Learning goals</summary><p className="whitespace-pre-wrap break-words pb-4">{row.message}</p></details>
     <section id="conversation" className="space-y-4"><h2 className="text-xl font-semibold">Conversation</h2><Suspense fallback={<LoadingState label="Loading lesson messages..." />}><LessonThread id={id} userId={user.id} accepted={!!row.accepted_at} open={row.status === "accepted"} cursor={await searchParams} /></Suspense></section>
     {row.status === "completed" && <section className="space-y-3 rounded-xl border bg-card p-5"><h2 className="text-xl font-semibold">Lesson feedback</h2>{review.data ? <><p>{review.data.rating} / 5</p><p className="whitespace-pre-wrap break-words">{review.data.comment}</p></> : !isTutor ? <LessonComposer id={id} kind="review" /> : <p>The learner has not submitted feedback yet.</p>}</section>}

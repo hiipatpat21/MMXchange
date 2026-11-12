@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import type { ExchangeActionState } from "@/lib/exchanges";
-import { parseManilaInput } from "@/lib/datetime";
+import { validMeetingStart, availabilityErrors } from "@/lib/availability";
 
 const skillId = z.coerce.number().int().positive().max(Number.MAX_SAFE_INTEGER);
 const requestSchema = z.object({
@@ -19,6 +19,7 @@ const requestSchema = z.object({
 });
 
 const rejectionMessages: Record<string, string> = {
+  ...availabilityErrors,
   not_complementary: "Your selected skills no longer match both learning lists. Reload the profile; without a mutual match, a paid offering is required.",
   not_logged_in: "Please sign in to continue.",
   self_request: "Choose another student for an exchange.",
@@ -74,11 +75,8 @@ export async function createExchangeRequest(_previous: ExchangeActionState, form
 }
 
 const sessionSchema = z.object({
-  startsAt: z.string().refine((value) => {
-    const date = parseManilaInput(value);
-    return !!date && date.getTime() > Date.now();
-  }, "Choose a valid future start time in Philippine time."),
-  duration: z.coerce.number().int().min(15, "Duration must be at least 15 minutes.").max(480, "Duration cannot exceed 480 minutes."),
+  startsAt: z.iso.datetime({ offset: true }).refine(value => validMeetingStart(value, Date.now()), "Choose a future shared time on the half-hour grid within 30 days."),
+  duration: z.coerce.number().int().refine(value => value === 60, "New and rescheduled meetings last one hour."),
   format: z.enum(["in_person", "online"], { message: "Choose a meeting format." }),
   venue: z.string().trim().min(2, "Enter a venue or meeting link.").max(200, "Keep the venue to 200 characters."),
   notes: z.string().trim().max(500, "Keep preparation notes to 500 characters."),
@@ -89,7 +87,7 @@ function sessionFields(formData: FormData) {
 }
 
 function sessionArguments(data: z.infer<typeof sessionSchema>) {
-  return { p_starts_at: parseManilaInput(data.startsAt)!.toISOString(), p_duration: data.duration, p_format: data.format, p_venue: data.venue, p_notes: data.notes || null };
+  return { p_starts_at: new Date(data.startsAt).toISOString(), p_duration: data.duration, p_format: data.format, p_venue: data.venue, p_notes: data.notes || null };
 }
 
 function sessionResult(data: unknown, error: { message: string } | null, exchangeId: string): ExchangeActionState {

@@ -1,3 +1,4 @@
+import { ProfileAvailability } from "@/components/availability/profile-availability";
 import { LoadingState } from "@/components/ui/loading-state";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
@@ -30,6 +31,7 @@ export default function ProfilePage() {
       <Suspense fallback={<LoadingState label="Loading your profile..." variant="form" />}>
         <ProfileLoader />
       </Suspense>
+      <Suspense fallback={<LoadingState label="Loading availability..." />}><ProfileAvailability /></Suspense>
     </div>
   );
 }

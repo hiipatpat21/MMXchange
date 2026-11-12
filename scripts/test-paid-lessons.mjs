@@ -51,7 +51,7 @@ code=`ok:${offer}`;await assert.rejects(future.requestPaidLesson(null,form({offe
 assert.equal("learner_id" in calls.at(-1).args,false);
 failed=true;assert.ok((await act.savePaidOffer(null,form({skill:2,price:"100",enabled:"on"}))).error);
 failed=false;code="not_complementary";
-const swaps=load("app/(app)/exchanges/actions.ts",{"@/lib/supabase/server":{createClient:async()=>client},"@/lib/datetime":load("lib/datetime.ts"),"next/cache":{revalidatePath:(...args)=>invalidated.push(args)},"next/navigation":{redirect:route=>{throw new Error(`REDIRECT:${route}`)}}});
+const swaps=load("app/(app)/exchanges/actions.ts",{"@/lib/supabase/server":{createClient:async()=>client},"@/lib/datetime":load("lib/datetime.ts"),"@/lib/availability":load("lib/availability.ts",{"@/lib/datetime":load("lib/datetime.ts")}),"next/cache":{revalidatePath:(...args)=>invalidated.push(args)},"next/navigation":{redirect:route=>{throw new Error(`REDIRECT:${route}`)}}});
 const before=invalidated.length;
 const rejected=await swaps.createExchangeRequest(null,form({recipientId:b,learnSkillId:2,teachSkillId:3,message:"Please swap skills with me",format:"online",mode:"free",requester_id:c,amount:0}));
 assert.match(rejected.error,/no longer match/);

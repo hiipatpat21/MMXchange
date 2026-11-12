@@ -80,7 +80,7 @@ async function ExchangeDetail({ params }: { params: Promise<{ id: string }> }) {
           <div><dt className="font-medium">Learning goals</dt><dd className="mt-1 whitespace-pre-line text-muted-foreground">{exchange.notes || "Not provided."}</dd></div>
         </dl>
       </details>
-      {sessionsError ? <p role="alert" className="text-destructive">Could not load sessions. Please reload to try again. On a new setup, run the prompt 3 SQL first.</p> : <ExchangeSessionList exchangeId={id} sessions={sessions} teachers={teachers} editable={editable} />}
+      {sessionsError ? <p role="alert" className="text-destructive">Could not load sessions. Please reload to try again. On a new setup, run the prompt 3 SQL first.</p> : <ExchangeSessionList exchangeId={id} sessions={sessions} teachers={teachers} editable={editable} now={now} />}
       {(exchange.status === "scheduled" || exchange.status === "completed") && <section className="space-y-3 surface-card p-5">
         <h2 className="text-lg font-semibold">Completion confirmations</h2>
         <p className="text-sm text-muted-foreground">Both students must confirm after at least one non-cancelled session has started. Confirm only when you consider the exchange finished.</p>
