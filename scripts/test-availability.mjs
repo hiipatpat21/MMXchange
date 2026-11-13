@@ -7,7 +7,7 @@ import ts from "typescript";
 const require=createRequire(import.meta.url);
 function load(file,imports={}) {
  const exports={}; const js=ts.transpileModule(readFileSync(file,"utf8"),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
- vm.runInNewContext(js,{exports,Intl,Date,require:name=>name in imports?imports[name]:require(name)},{filename:file});return exports;
+ vm.runInNewContext(js,{exports,Intl,Date,URL,require:name=>name in imports?imports[name]:require(name)},{filename:file});return exports;
 }
 const datetime=load("lib/datetime.ts");
 const lib=load("lib/availability.ts",{"@/lib/datetime":datetime});
@@ -27,7 +27,7 @@ const id="11111111-1111-4111-8111-111111111111",other="22222222-2222-4222-8222-2
 let signedIn=false,code="ok",failed=false,slotRows=[];
 const calls=[],invalidated=[];
 const client={auth:{getUser:async()=>({data:{user:signedIn?{id}:null}})},rpc:async(name,args)=>{calls.push({name,args});return {data:name==="shared_learning_slots"?slotRows:code,error:failed?{}:null};},from:()=>{const q={select:()=>q,eq:()=>q,maybeSingle:async()=>({data:{requester_id:id,recipient_id:other,teach_skill_id:1,learn_skill_id:2,exchange_id:id},error:null})};return q;}};
-const imports={"@/lib/availability":lib,"@/lib/supabase/server":{createClient:async()=>client},"next/cache":{revalidatePath:(...args)=>invalidated.push(args)}};
+const imports={"@/lib/meeting-links":load("lib/meeting-links.ts"),"@/lib/availability":lib,"@/lib/supabase/server":{createClient:async()=>client},"next/cache":{revalidatePath:(...args)=>invalidated.push(args)}};
 const availability=load("app/(app)/profile/availability-actions.ts",imports);
 const slots=load("app/(app)/exchanges/slot-actions.ts",imports);
 const form=value=>{const data=new FormData();for(const[k,v]of Object.entries(value))data.set(k,v);return data;};
@@ -49,15 +49,15 @@ assert.equal(calls.at(-1).args.p_exclude,other);assert.equal("profile_id"in call
 failed=true;assert.ok((await slots.getSharedSlots({kind:"paid",id,day:"2026-11-14"})).error);failed=false;
 const swaps=load("app/(app)/exchanges/actions.ts",{...imports,"next/navigation":{redirect:()=>{}}});
 const future=new Date(Math.ceil((Date.now()+86400000)/1800000)*1800000).toISOString();
-const meeting={exchangeId:id,teacherId:id,startsAt:future,duration:60,format:"online",venue:"Test meeting",skillId:999};
+const meeting={exchangeId:id,teacherId:id,startsAt:future,duration:60,format:"online",venue:"https://meet.example.com/test",skillId:999};
 const before=calls.length;
 assert.ok((await swaps.scheduleSession(null,form({...meeting,duration:30}))).error);assert.equal(calls.length,before);
 code="slot_taken";assert.ok((await swaps.scheduleSession(null,form(meeting))).error);
 assert.equal(calls.at(-1).args.p_skill_id,1);assert.equal(calls.at(-1).args.p_duration,60);
 const booking=load("app/(app)/lessons/booking-actions.ts",{...imports,"@/lib/paid-lessons":{PAID_BOOKING_READY:false}});
 const pausedCount=calls.length;
-assert.ok((await booking.reservePaidBooking(null,form({id,startsAt:future,format:"online",venue:"Test"}))).error);assert.equal(calls.length,pausedCount);
+assert.ok((await booking.reservePaidBooking(null,form({id,startsAt:future,format:"online",venue:"https://meet.example.com/test"}))).error);assert.equal(calls.length,pausedCount);
 const ready=load("app/(app)/lessons/booking-actions.ts",{...imports,"@/lib/paid-lessons":{PAID_BOOKING_READY:true}});
-code="slot_taken";assert.ok((await ready.reservePaidBooking(null,form({id,startsAt:future,format:"online",venue:"Test",learner_id:other}))).error);
+code="slot_taken";assert.ok((await ready.reservePaidBooking(null,form({id,startsAt:future,format:"online",venue:"https://meet.example.com/test",learner_id:other}))).error);
 assert.equal("learner_id"in calls.at(-1).args,false);
 console.log("Availability mocked checks passed: Manila dates, strict hours/grid/horizon, authenticated payloads, missing calendars, stale slots, fixed durations and paid rollout gate.");

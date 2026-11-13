@@ -5,6 +5,7 @@ import { formatDateTime } from "@/lib/datetime";
 import { Button } from "@/components/ui/button";
 import { LearningIllustration } from "@/components/ui/learning-illustration";
 import { RefreshButton } from "@/components/messages/refresh-button";
+import { MeetingLocation } from "@/components/meetings/meeting-location";
 
 export async function HomeOverview() {
   const { supabase, user } = await getDashboardContext();
@@ -15,7 +16,8 @@ export async function HomeOverview() {
       <h2 id="next-meeting-heading" className="text-lg font-semibold">Your next meeting</h2>
       {data.meetingError ? <><p role="alert">Could not load your meetings. Refresh to try again.</p><RefreshButton /></> : next ? <>
         <p className="break-words text-2xl font-semibold">{next.title}</p><p className="text-lg font-medium text-primary">{formatDateTime(next.at)}</p><p className="text-sm text-muted-foreground">{next.kind} · Confirmed · Philippine time</p>
-        <Button asChild><Link href={next.href}>View meeting details</Link></Button>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2"><Button asChild><Link href={next.href}>View meeting details</Link></Button>
+          {next.format && next.venue && <MeetingLocation format={next.format} venue={next.venue} state="confirmed" editHref={next.href} />}</div>
         {!!later.length && <details className="disclosure"><summary>More upcoming meetings</summary><ul className="divide-y">{later.map(row => <li key={row.id}><Link className="flex min-h-11 flex-wrap justify-between gap-2 py-3 text-sm" href={row.href}><span className="break-words font-medium">{row.title}</span><span>{formatDateTime(row.at)}</span></Link></li>)}</ul></details>}
       </> : <div className="flex items-center gap-4"><div className="min-w-0 flex-1 space-y-3"><p>No confirmed meetings yet.</p><p className="text-sm text-muted-foreground">Find a tutor or open My learning to continue a request. Skills are optional for paid lessons.</p><Button asChild><Link href="/discover">Find a tutor</Link></Button></div><LearningIllustration scene="curious" className="w-20 shrink-0 sm:w-24" sizes="96px" /></div>}
     </section>

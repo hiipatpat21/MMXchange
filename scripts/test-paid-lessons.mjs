@@ -7,7 +7,7 @@ import ts from "typescript";
 const require=createRequire(import.meta.url);
 function load(file,imports={}) {
  const exports={}; const js=ts.transpileModule(readFileSync(file,"utf8"),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
- vm.runInNewContext(js,{exports,Intl,require:name=>name in imports?imports[name]:require(name)},{filename:file}); return exports;
+ vm.runInNewContext(js,{exports,Intl,URL,require:name=>name in imports?imports[name]:require(name)},{filename:file}); return exports;
 }
 const relations=load("lib/relations.ts");
 const lib=load("lib/paid-lessons.ts",{"@/lib/relations":relations});
@@ -51,7 +51,7 @@ code=`ok:${offer}`;await assert.rejects(future.requestPaidLesson(null,form({offe
 assert.equal("learner_id" in calls.at(-1).args,false);
 failed=true;assert.ok((await act.savePaidOffer(null,form({skill:2,price:"100",enabled:"on"}))).error);
 failed=false;code="not_complementary";
-const swaps=load("app/(app)/exchanges/actions.ts",{"@/lib/supabase/server":{createClient:async()=>client},"@/lib/datetime":load("lib/datetime.ts"),"@/lib/availability":load("lib/availability.ts",{"@/lib/datetime":load("lib/datetime.ts")}),"next/cache":{revalidatePath:(...args)=>invalidated.push(args)},"next/navigation":{redirect:route=>{throw new Error(`REDIRECT:${route}`)}}});
+const swaps=load("app/(app)/exchanges/actions.ts",{"@/lib/meeting-links":load("lib/meeting-links.ts"),"@/lib/supabase/server":{createClient:async()=>client},"@/lib/datetime":load("lib/datetime.ts"),"@/lib/availability":load("lib/availability.ts",{"@/lib/datetime":load("lib/datetime.ts")}),"next/cache":{revalidatePath:(...args)=>invalidated.push(args)},"next/navigation":{redirect:route=>{throw new Error(`REDIRECT:${route}`)}}});
 const before=invalidated.length;
 const rejected=await swaps.createExchangeRequest(null,form({recipientId:b,learnSkillId:2,teachSkillId:3,message:"Please swap skills with me",format:"online",mode:"free",requester_id:c,amount:0}));
 assert.match(rejected.error,/no longer match/);

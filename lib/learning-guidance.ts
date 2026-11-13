@@ -13,7 +13,7 @@ export function lessonGuide({ id, status, isTutor, booking, payment, now, ownCon
   return { label: isTutor ? "View payment instructions" : "Upload receipt", text: isTutor ? "The time is reserved. Waiting for the learner's receipt." : payment?.status === "rejected" ? "Read the tutor's reason and submit a replacement receipt." : "Pay using the agreed instructions, then submit your receipt for review.", href: `${base}#payment` };
 }
 
-export type HomeMeeting = { id: string; title: string; at: string; kind: string; href: string };
+export type HomeMeeting = { id: string; title: string; at: string; kind: string; href: string; format?: string; venue?: string };
 export type HomeTask = { id: string; title: string; label: string; href: string; at: string; priority: number };
 export function homePreview(meetings: HomeMeeting[], tasks: HomeTask[]) {
   return {

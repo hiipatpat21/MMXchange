@@ -4,6 +4,7 @@ import { formatDateTime } from "@/lib/datetime";
 import { StatusBadge } from "@/components/exchanges/status-badge";
 import { ExchangeSessionForm } from "@/components/exchanges/exchange-session-form";
 import { ExchangeSessionAction } from "@/components/exchanges/exchange-session-action";
+import { MeetingLocation } from "@/components/meetings/meeting-location";
 
 export function ExchangeSessionList({ exchangeId, sessions, teachers, editable, now }: { exchangeId: string; sessions: ExchangeSession[]; teachers: ExchangeTeacher[]; editable: boolean; now: number }) {
   return (
@@ -17,11 +18,11 @@ export function ExchangeSessionList({ exchangeId, sessions, teachers, editable, 
             <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="break-words font-semibold">{teacher?.name ?? "Student"} teaches {teacher?.skillName ?? "the agreed skill"}</h3><StatusBadge status={session.status} /></div>
             <dl className="space-y-2 break-words text-sm">
               <div><dt className="text-muted-foreground">When</dt><dd>{formatDateTime(session.starts_at)} · {session.duration_minutes} minutes</dd></div>
-              <div><dt className="text-muted-foreground">{session.format === "online" ? "Online meeting" : "In-person venue"}</dt><dd className="whitespace-pre-line">{session.venue}</dd></div>
+              <div><dt className="text-muted-foreground">{session.format === "online" ? "Online meeting" : "In-person venue"}</dt><dd><MeetingLocation format={session.format} venue={session.venue} state={editable && session.status === "scheduled" ? "confirmed" : "closed"} editHref={editable && session.status === "scheduled" ? `#edit-${session.id}` : undefined} /></dd></div>
               <div><dt className="text-muted-foreground">What to prepare</dt><dd className="whitespace-pre-line">{session.notes || "No preparation notes provided."}</dd></div>
             </dl>
             {editable && session.status === "scheduled" && <>
-              <details className="rounded-lg border p-3"><summary className="min-h-11 cursor-pointer py-2 text-sm font-medium">Reschedule session</summary><ExchangeSessionForm exchangeId={exchangeId} teachers={teachers} session={session} now={now} /></details>
+              <details className="rounded-lg border p-3"><summary className="min-h-11 cursor-pointer py-2 text-sm font-medium">Reschedule or update meeting details</summary><div id={`edit-${session.id}`}><ExchangeSessionForm exchangeId={exchangeId} teachers={teachers} session={session} now={now} /></div></details>
               <ExchangeSessionAction id={session.id} type="cancel" />
             </>}
           </li>;

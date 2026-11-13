@@ -1,4 +1,5 @@
 "use server";
+import { validMeetingLocation, meetingUrlHint } from "@/lib/meeting-links";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -100,7 +101,7 @@ function sessionResult(data: unknown, error: { message: string } | null, exchang
 }
 
 export async function scheduleSession(_previous: ExchangeActionState, formData: FormData): Promise<ExchangeActionState> {
-  const parsed = sessionSchema.extend({ exchangeId: z.string().uuid(), teacherId: z.string().uuid() }).safeParse({ ...sessionFields(formData), exchangeId: formData.get("exchangeId"), teacherId: formData.get("teacherId") });
+  const parsed = sessionSchema.extend({ exchangeId: z.string().uuid(), teacherId: z.string().uuid() }).refine(validMeetingLocation, { path:["venue"], message:meetingUrlHint }).safeParse({ ...sessionFields(formData), exchangeId: formData.get("exchangeId"), teacherId: formData.get("teacherId") });
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -117,7 +118,7 @@ export async function scheduleSession(_previous: ExchangeActionState, formData: 
 }
 
 export async function rescheduleSession(_previous: ExchangeActionState, formData: FormData): Promise<ExchangeActionState> {
-  const parsed = sessionSchema.extend({ sessionId: z.string().uuid() }).safeParse({ ...sessionFields(formData), sessionId: formData.get("sessionId") });
+  const parsed = sessionSchema.extend({ sessionId: z.string().uuid() }).refine(validMeetingLocation, { path:["venue"], message:meetingUrlHint }).safeParse({ ...sessionFields(formData), sessionId: formData.get("sessionId") });
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { scheduleSession, rescheduleSession } from "@/app/(app)/exchanges/actions";
 import type { ExchangeSession, ExchangeTeacher } from "@/lib/exchanges";
 import { SharedSlotPicker } from "@/components/availability/shared-slot-picker";
@@ -8,12 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { meetingUrlHint } from "@/lib/meeting-links";
 
 const selectClass = "h-11 w-full min-w-0 rounded-xl border border-input bg-card px-3 text-base sm:text-sm focus-visible:outline-2 focus-visible:outline-primary";
 
 export function ExchangeSessionForm({ exchangeId, teachers, session, now }: { exchangeId: string; teachers: ExchangeTeacher[]; session?: ExchangeSession; now: number }) {
   const [state, action, pending] = useActionState(session ? rescheduleSession : scheduleSession, null);
   const prefix = session?.id ?? "new-session";
+  const [format, setFormat] = useState(session?.format ?? "in_person");
 
   return (
     <form action={action} className="space-y-4 pt-4">
@@ -30,14 +32,14 @@ export function ExchangeSessionForm({ exchangeId, teachers, session, now }: { ex
       <SharedSlotPicker kind="exchange" id={exchangeId} exclude={session?.id} now={now} />
       <div className="min-w-0 space-y-2">
         <Label htmlFor={`${prefix}-format`}>Format</Label>
-        <select id={`${prefix}-format`} name="format" defaultValue={session?.format ?? "in_person"} required className={selectClass}>
+        <select id={`${prefix}-format`} name="format" defaultValue={session?.format ?? "in_person"} onChange={event => setFormat(event.target.value === "online" ? "online" : "in_person")} required className={selectClass}>
           <option value="in_person">In person</option><option value="online">Online</option>
         </select>
       </div>
       <div className="space-y-2">
-        <Label htmlFor={`${prefix}-venue`}>Venue or meeting link</Label>
-        <Input id={`${prefix}-venue`} name="venue" minLength={2} maxLength={200} required defaultValue={session?.venue ?? ""} aria-describedby={`${prefix}-venue-hint`} className="h-10" />
-        <p id={`${prefix}-venue-hint`} className="text-sm text-muted-foreground">For in-person sessions, choose a public, easy-to-find place.</p>
+        <Label htmlFor={`${prefix}-venue`}>{format === "online" ? "Online meeting URL" : "In-person venue"}</Label>
+        <Input id={`${prefix}-venue`} name="venue" type={format === "online" ? "url" : "text"} minLength={2} maxLength={200} required defaultValue={session?.venue ?? ""} placeholder={format === "online" ? "https://meet.example.com/your-meeting" : "Public meeting place"} aria-describedby={`${prefix}-venue-hint`} className="h-10" />
+        <p id={`${prefix}-venue-hint`} className="text-sm text-muted-foreground">{format === "online" ? meetingUrlHint : "Choose a public, easy-to-find place."}</p>
       </div>
       <div className="space-y-2">
         <Label htmlFor={`${prefix}-notes`}>What to prepare (optional)</Label>

@@ -16,7 +16,7 @@ const fixtureDay=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Manila",year:"n
 let pickerState=0;
 const pickerValues=[fixtureDay,{slots:[fixtureTime],code:"ok"},fixtureTime,false];
 const imports = {
-  "react": {...React,useState:()=>[pickerValues[pickerState++%4],()=>{}]},
+  "react": {...React,useState:initial=>typeof initial === "string" && ["online","in_person"].includes(initial) ? [initial,()=>{}] : [pickerValues[pickerState++%4],()=>{}]},
   "@/app/(app)/profile/availability-actions": { changeAvailability: noAction },
   "@/app/(app)/exchanges/actions": { scheduleSession: noAction, rescheduleSession: noAction },
   "@/app/(app)/exchanges/slot-actions": { getSharedSlots: async()=>({slots:[fixtureTime],code:"ok"}) },
