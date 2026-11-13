@@ -14,21 +14,21 @@ export function StudentFiltersForm({ filters, skills }: { filters: StudentFilter
     <form action="/discover" method="get" className="filter-panel space-y-4" key={JSON.stringify(filters)}>
       <input type="hidden" name="view" value="browse" />
       <div className="min-w-0 space-y-2">
+        <Label htmlFor="skill">What do you want to learn?</Label>
+        <select id="skill" name="skill" defaultValue={filters.skill} className={selectClass}>
+          <option value="">All skills</option>
+          {skills.map((skill) => <option key={skill.id} value={skill.id}>{skill.name}</option>)}
+        </select>
+      </div>
+      <details open={!!(filters.category || filters.q || filters.college)}><summary className="text-sm font-medium">More filters</summary><div className="min-w-0 space-y-2 pt-3">
         <Label htmlFor="q">Student name</Label>
         <Input id="q" name="q" defaultValue={filters.q} maxLength={100} placeholder="Search by name" className="h-10" />
       </div>
-      <details open={!!(filters.category || filters.skill || filters.college)}><summary className="text-sm font-medium">More filters</summary><div className="grid gap-4 py-3 sm:grid-cols-2"><div className="min-w-0 space-y-2">
+      <div className="grid gap-4 py-3 sm:grid-cols-2"><div className="min-w-0 space-y-2">
         <Label htmlFor="category">Teaching category</Label>
         <select id="category" name="category" defaultValue={filters.category} className={selectClass}>
           <option value="">All categories</option>
           {categories.map((category) => <option key={category} value={category}>{category}</option>)}
-        </select>
-      </div>
-      <div className="min-w-0 space-y-2">
-        <Label htmlFor="skill">Skill they can teach</Label>
-        <select id="skill" name="skill" defaultValue={filters.skill} className={selectClass}>
-          <option value="">All skills</option>
-          {skills.map((skill) => <option key={skill.id} value={skill.id}>{skill.name}</option>)}
         </select>
       </div>
       <div className="min-w-0 space-y-2">

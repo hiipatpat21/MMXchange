@@ -47,15 +47,16 @@ export function Topbar({ displayName, avatarUrl, profileError, unreadCount, noti
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
+          <DropdownMenuLabel className="max-w-64 break-words whitespace-normal">{displayName}</DropdownMenuLabel>
           {profileError && <p role="alert" className="max-w-56 px-2 py-1 text-xs text-destructive">Could not load your profile name. Reload to try again.</p>}
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href="/profile">My Profile</Link>
+            <Link href="/profile">My profile</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/skills">My Skills</Link>
+            <Link href="/skills">My skills (optional)</Link>
           </DropdownMenuItem>
+          <DropdownMenuItem asChild><Link href="/profile#availability">My availability</Link></DropdownMenuItem>
           <LogoutMenuItem />
         </DropdownMenuContent>
       </DropdownMenu>

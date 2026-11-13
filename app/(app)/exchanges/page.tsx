@@ -48,7 +48,6 @@ async function ExchangeList({ searchParams }: { searchParams: SearchParams }) {
   const exchanges = (list.data ?? []) as ExchangeRow[];
   return (
     <div className="space-y-5">
-      {params.notice === "groups-retired" && <p role="status" className="rounded-xl border bg-card p-4">Group sessions are no longer available. Your individual learning is below.</p>}
       <nav aria-label="Exchange filters" className="section-tabs">
         {tabs.map((key) => <Link key={key} href={`/exchanges?tab=${key}`} aria-current={tab === key ? "page" : undefined}>{labels[key]} <span className="ml-2 tabular-nums text-muted-foreground">{counts[key]}</span></Link>)}
       </nav>
@@ -68,17 +67,16 @@ async function ExchangeList({ searchParams }: { searchParams: SearchParams }) {
   );
 }
 
-async function PaidLessons({ searchParams }: { searchParams: SearchParams }) {
-  const page = z.coerce.number().int().min(1).max(10000).safeParse((await searchParams).lessonPage ?? 1);
-  return <PaidLessonList page={page.success ? page.data : 1} />;
+async function LearningContent({ searchParams }: { searchParams: SearchParams }) {
+  const params = await searchParams;
+  const paid = params.view === "paid" || params.lessonPage !== undefined;
+  const page = z.coerce.number().int().min(1).max(10000).safeParse(params.lessonPage ?? 1);
+  return <div className="space-y-5">
+    {params.notice === "groups-retired" && <p role="status" className="rounded-xl border bg-card p-4">Group sessions are no longer available. Your individual learning is below.</p>}
+    <nav aria-label="Learning mode" className="section-tabs"><Link href="/exchanges" aria-current={!paid ? "page" : undefined}>Free skill swaps</Link><Link href="/exchanges?view=paid" aria-current={paid ? "page" : undefined}>Paid lessons</Link></nav>
+    {paid ? <PaidLessonList page={page.success ? page.data : 1} /> : <ExchangeList searchParams={searchParams} />}
+  </div>;
 }
-
 export default function ExchangesPage({ searchParams }: { searchParams: SearchParams }) {
-  return (
-    <div className="space-y-6">
-      <PageIntro title="My learning" description="Your free skill swaps and paid individual lessons." />
-      <Suspense fallback={<LoadingState label="Loading exchanges..." />}><ExchangeList searchParams={searchParams} /></Suspense>
-      <Suspense fallback={<LoadingState label="Loading paid lessons..." />}><PaidLessons searchParams={searchParams} /></Suspense>
-    </div>
-  );
+  return <div className="space-y-6"><PageIntro title="My learning" description="Continue a request, schedule a meeting, or check a payment." /><Suspense fallback={<LoadingState label="Loading your learning..." />}><LearningContent searchParams={searchParams} /></Suspense></div>;
 }

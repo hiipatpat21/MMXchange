@@ -7,7 +7,7 @@ import { PageIntro } from "@/components/layout/page-intro";
 export default function SkillsPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <PageIntro title="What’s your thing?" description="Something to share. Something to discover. Your two lists bring the right people together." />
+      <PageIntro title="My skills" description="Optional for learners. Add skills to find free swaps or offer paid teaching." />
       <Suspense fallback={<LoadingState label="Loading your skills..." />}>
         <SkillsLoader />
       </Suspense>

@@ -13,7 +13,7 @@ export function ExchangeCard({ exchange, userId }: { exchange: ExchangeRow; user
       </div>
       <div className="grid gap-3 rounded-xl bg-secondary/50 p-3 text-sm sm:grid-cols-2"><p className="break-words"><span className="mb-1 block text-xs text-muted-foreground">You share</span>{view.youTeach}</p><p className="break-words"><span className="mb-1 block text-xs text-muted-foreground">You learn</span>{view.theyTeach}</p></div>
       <p className="text-sm text-muted-foreground">Requested {formatDateTime(exchange.created_at)}</p>
-      <span className="text-sm font-medium text-primary">Continue exchange →</span>
+      <span className="text-sm font-medium text-primary">{exchange.status === "pending" ? exchange.recipient_id === userId ? "Review request" : "View sent request" : exchange.status === "accepted" ? "Choose a shared hour" : exchange.status === "scheduled" ? "View meetings" : "View history"} →</span>
     </Link>
   );
 }

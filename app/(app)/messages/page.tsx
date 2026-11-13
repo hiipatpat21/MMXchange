@@ -36,6 +36,12 @@ async function PaidConversations({ searchParams }: { searchParams: Promise<{ les
   return <PaidLessonList conversations page={page.success ? page.data : 1} />;
 }
 
-export default function MessagesPage({ searchParams }: { searchParams: Promise<{ page?: string; lessonPage?: string }> }) {
-  return <div className="mx-auto max-w-3xl space-y-6"><PageIntro title="Keep the conversation going" description="Plan your learning in a private conversation. Refresh for new messages."><RefreshButton /></PageIntro><Suspense fallback={<LoadingState label="Loading conversations…" />}><Conversations searchParams={searchParams} /></Suspense><Suspense fallback={<LoadingState label="Loading paid conversations..." />}><PaidConversations searchParams={searchParams} /></Suspense></div>;
+type MessageParams = Promise<{ page?: string; lessonPage?: string; view?: string }>;
+async function MessageViews({ searchParams }: { searchParams: MessageParams }) {
+  const query = await searchParams;
+  const paid = query.view === "paid" || query.lessonPage !== undefined;
+  return <div className="space-y-5"><nav aria-label="Conversation type" className="section-tabs"><Link href="/messages" aria-current={!paid ? "page" : undefined}>Skill swaps</Link><Link href="/messages?view=paid" aria-current={paid ? "page" : undefined}>Paid lessons</Link></nav>{paid ? <PaidConversations searchParams={searchParams} /> : <Conversations searchParams={searchParams} />}</div>;
+}
+export default function MessagesPage({ searchParams }: { searchParams: MessageParams }) {
+  return <div className="mx-auto max-w-3xl space-y-6"><PageIntro title="Messages" description="Your private conversations. Refresh to check for replies."><RefreshButton /></PageIntro><Suspense fallback={<LoadingState label="Loading conversations..." />}><MessageViews searchParams={searchParams} /></Suspense></div>;
 }

@@ -49,13 +49,16 @@ async function ExchangeDetail({ params }: { params: Promise<{ id: string }> }) {
   ];
   return (
     <article className="mx-auto max-w-2xl space-y-6">
+      <Link href="/exchanges" className="inline-flex min-h-11 items-center text-sm text-primary underline">Back to My learning</Link>
       <header className="space-y-3">
         <StatusBadge status={exchange.status} />
         <h1 className="break-words page-heading">Exchange with {view.otherName}</h1>
-        <p className="text-sm text-muted-foreground">Requested {formatDateTime(exchange.created_at)}</p>
+        <p className="text-sm text-muted-foreground">Free skill swap · You both teach and learn.</p>
       </header>
       {canMessage(exchange.status) && <Button asChild variant="outline"><Link href={`/messages/${id}`} className="max-w-full whitespace-normal break-words">Message {view.otherName}</Link></Button>}
       {progress && <ExchangeProgress currentStep={progress.currentStep} nextAction={progress.nextAction} status={exchange.status} />}
+      {exchange.status === "accepted" && <Button asChild><Link href="#schedule-session">Choose a shared hour</Link></Button>}
+      {exchange.status === "scheduled" && progress?.nextSession && <Button asChild><Link href="#sessions-heading">View meeting details</Link></Button>}
       <section className="space-y-4 surface-card p-5">
         <h2 className="text-lg font-semibold">Exchange summary</h2>
         <p className="break-words text-sm">Requested by <Link className="text-primary underline" href={`/students/${exchange.requester_id}`}>{pickOne(exchange.requester)?.display_name ?? "Student"}</Link> for <Link className="text-primary underline" href={`/students/${exchange.recipient_id}`}>{pickOne(exchange.recipient)?.display_name ?? "Student"}</Link>.</p>
@@ -75,23 +78,25 @@ async function ExchangeDetail({ params }: { params: Promise<{ id: string }> }) {
       <details className="disclosure" open={canRespond}>
         <summary>Original request & learning goals</summary>
         <dl className="space-y-4 break-words">
+          <div><dt className="font-medium">Requested</dt><dd>{formatDateTime(exchange.created_at)}</dd></div>
           <div><dt className="font-medium">Message</dt><dd className="mt-1 whitespace-pre-line text-muted-foreground">{exchange.message}</dd></div>
           <div><dt className="font-medium">Availability</dt><dd className="mt-1 whitespace-pre-line text-muted-foreground">{exchange.availability || "Not provided."}</dd></div>
           <div><dt className="font-medium">Learning goals</dt><dd className="mt-1 whitespace-pre-line text-muted-foreground">{exchange.notes || "Not provided."}</dd></div>
         </dl>
       </details>
+      {canRespond && <ExchangeResponse exchangeId={id} canRespond />}
       {sessionsError ? <p role="alert" className="text-destructive">Could not load sessions. Please reload to try again. On a new setup, run the prompt 3 SQL first.</p> : <ExchangeSessionList exchangeId={id} sessions={sessions} teachers={teachers} editable={editable} now={now} />}
-      {(exchange.status === "scheduled" || exchange.status === "completed") && <section className="space-y-3 surface-card p-5">
-        <h2 className="text-lg font-semibold">Completion confirmations</h2>
+      {(exchange.status === "scheduled" || exchange.status === "completed") && <details className="disclosure" open={!!progress?.canComplete}>
+        <summary>Completion confirmations</summary>
         <p className="text-sm text-muted-foreground">Both students must confirm after at least one non-cancelled session has started. Confirm only when you consider the exchange finished.</p>
         <ul className="space-y-2 text-sm">
           {[{ name: teachers[0].name, at: exchange.requester_completed_at }, { name: teachers[1].name, at: exchange.recipient_completed_at }].map((person, index) => <li key={teachers[index].id} className="break-words">{person.name}: {person.at ? `Confirmed ${formatDateTime(person.at)}` : "Not confirmed yet."}</li>)}
         </ul>
         {progress?.canComplete && <ExchangeSessionAction id={id} type="complete" />}
-      </section>}
-      {(canRespond || canCancel) && <ExchangeResponse exchangeId={id} canRespond={canRespond} />}
+      </details>}
+      {canCancel && !canRespond && <ExchangeResponse exchangeId={id} canRespond={false} />}
       {exchange.status === "completed" && <Suspense fallback={<LoadingState label="Loading feedback…" />}><ExchangeFeedback exchangeId={id} submitted={feedbackSubmitted} /></Suspense>}
-      <Link href="/exchanges" className="inline-flex min-h-11 items-center text-sm text-primary underline">Back to exchanges</Link>
+
     </article>
   );
 }

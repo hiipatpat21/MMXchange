@@ -111,7 +111,7 @@ async function DiscoverContent({ searchParams }: { searchParams: SearchParams })
 export default function DiscoverPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="space-y-8">
-      <PageIntro title="Find your learning people" description="Find a complementary skill swap or explore paid teaching offers. Skills are optional for learners." />
+      <PageIntro title="Find a tutor" description="Swap skills for free when you can teach each other, or choose a paid lesson. You can browse without adding skills." />
       <Suspense fallback={<LoadingState label="Loading discovery..." />}><DiscoverContent searchParams={searchParams} /></Suspense>
     </div>
   );

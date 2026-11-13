@@ -17,7 +17,7 @@ export function TwoWays() {
         <div className="space-y-4 md:col-start-1 md:row-start-2">
           <h3 className="text-2xl font-semibold">Learn with a tutor.</h3>
           <p>No skill to offer in return? Browse individual tutors and their listed lesson fees. Paid requests open when payment setup is ready.</p>
-          <p className="font-medium text-primary">Your skills are optional. Tutor fees are agreed before payment.</p>
+          <p className="font-medium text-primary">Pay directly through GCash, upload a receipt, then wait for the tutor to confirm.</p>
           <Link href="/discover?view=browse" className="landing-text-link">Browse tutors <span aria-hidden="true">→</span></Link>
         </div>
       </div>
