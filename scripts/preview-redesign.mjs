@@ -25,7 +25,6 @@ const client = { from: table => {
     let data = [];
     if (table === "profiles") data = [{ display_name: "Lia Cruz", college: "", program: "", bio: "Learning together" }];
     if (!empty && table === "profile_skills") data = [{ skill_id: 1 }];
-    if (!empty && table === "group_session_registrations") data = [{ session_id: id }];
     if (!empty && table === "exchange_requests") {
       const accepted = filters.some(([key, value]) => key === "status" && value === "accepted");
       data = [{ id: accepted ? id : partnerId, requester_id: partnerId, recipient_id: id, status: accepted ? "accepted" : "pending", requester: { display_name: "Ren Santos" }, recipient: { display_name: "Lia Cruz" }, teach_skill: { name: "Python" }, learn_skill: { name: "Graphic Design" } }];
@@ -51,10 +50,7 @@ const imports = {
     getDashboardMatches: async () => { if (failed) throw new Error("Fixture error"); return matches; },
     chooseDashboardSuggestion: () => ({ title: empty ? "Add a skill you can teach" : "Schedule your first exchange session", reason: empty ? "A skill you share could start a great exchange." : "You have an accepted exchange that is ready for a teaching session.", href: empty ? "/skills" : `/exchanges/${id}`, label: empty ? "Add your skills" : "Schedule a session" }),
   },
-  "@/lib/group-sessions": { loadSessionCards: async (_client, options) => {
-    if (failed) throw new Error("Fixture error");
-    return { sessions: empty || options.organizerId ? [] : [{ id: partnerId, title: "An introduction to photography", starts_at: when }], capped: false };
-  } },
+
 };
 const cache = new Map();
 function load(file) {

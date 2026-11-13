@@ -48,6 +48,7 @@ async function ExchangeList({ searchParams }: { searchParams: SearchParams }) {
   const exchanges = (list.data ?? []) as ExchangeRow[];
   return (
     <div className="space-y-5">
+      {params.notice === "groups-retired" && <p role="status" className="rounded-xl border bg-card p-4">Group sessions are no longer available. Your individual learning is below.</p>}
       <nav aria-label="Exchange filters" className="section-tabs">
         {tabs.map((key) => <Link key={key} href={`/exchanges?tab=${key}`} aria-current={tab === key ? "page" : undefined}>{labels[key]} <span className="ml-2 tabular-nums text-muted-foreground">{counts[key]}</span></Link>)}
       </nav>

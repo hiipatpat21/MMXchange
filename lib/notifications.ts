@@ -31,5 +31,6 @@ export async function getRecentNotifications(limit = 5, offset = 0, client?: Sup
 
 // Allow only implemented, local UUID detail routes; never follow arbitrary URLs.
 export function notificationDestination(link: string | null): string {
-  return link && /^\/(exchanges|sessions|messages|forum|lessons)\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(link) ? link : "/notifications";
+  if (link && /^\/sessions(?:\/|$)/i.test(link)) return "/exchanges?notice=groups-retired";
+  return link && /^\/(exchanges|messages|forum|lessons)\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(link) ? link : "/notifications";
 }

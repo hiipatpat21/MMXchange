@@ -17,12 +17,36 @@ try {
  alter table storage.objects enable row level security;
  create function storage.foldername(name text) returns text[] language sql immutable as $$select string_to_array(name,'/')$$;
  grant usage on schema storage to anon,authenticated;`);
- for(const file of ['lib/supabase/schema.sql','supabase/schema.sql']) { await db.exec(readFileSync(file,'utf8'));console.log('Applied locally: '+file); }
+ for(const file of ['lib/supabase/schema.sql','supabase/schema.sql']) {
+   const sql=readFileSync(file,'utf8').split('-- Stage A: retire group activity.')[0];
+   await db.exec(sql);console.log('Applied locally: '+file);
+ }
  await db.exec(readFileSync('supabase/migrations/20261113_teacher_prompt_4_availability.sql','utf8'));
  console.log('Prompt 4 rerun succeeded.');
  await db.exec(readFileSync('supabase/migrations/20261113_teacher_prompt_5_payments.sql','utf8'));
  await db.exec(readFileSync('supabase/migrations/20261113_teacher_prompt_5_payments.sql','utf8'));
  console.log('Prompt 5 applied and rerun succeeded.');
+ const retirement=readFileSync('supabase/migrations/20261113_teacher_prompt_6_retire_groups.sql','utf8');
+ const deletion=readFileSync('supabase/migrations/20261113_teacher_prompt_6_delete_empty_groups.sql','utf8');
+ await db.exec(retirement);await db.exec(retirement);
+ // A related notification alone must stop deletion and roll back every DDL change.
+ await db.exec(`insert into auth.users(id) values('99999999-9999-4999-8999-999999999999');
+ insert into public.notifications(recipient_id,type,title,link) values('99999999-9999-4999-8999-999999999999','group_session_updated','Backup guard fixture','/sessions/99999999-9999-4999-8999-999999999999');`);
+ let blocked=false;
+ try { await db.exec(deletion); } catch(error) { blocked=error.message.includes('Group data exists'); await db.exec('rollback'); }
+ if(!blocked)throw Error('Nonempty group deletion was not blocked');
+ await db.exec(`delete from public.notifications where type='group_session_updated';`);
+ for(const signature of ['register_for_session(uuid)','registration_counts(uuid[])','complete_group_session(uuid)','cancel_group_session(uuid)','update_group_session(uuid,text,bigint,text,text,text,timestamptz,integer,text,text,integer,timestamptz)','submit_session_feedback(uuid,integer,boolean,text)','get_session_feedback_summary(uuid)']) {
+  const revoked=await db.query(`select has_function_privilege('authenticated',$1,'execute') as allowed`,['public.'+signature]);
+  if(revoked.rows[0].allowed)throw Error('Retired RPC remains executable: '+signature);
+ }
+ await db.exec(`set role authenticated; select set_config('request.jwt.claim.sub','99999999-9999-4999-8999-999999999999',false)`);
+ let denied=false;
+ try { await db.exec(`select public.register_for_session('99999999-9999-4999-8999-999999999999')`); } catch(error) { denied=error.message.includes('permission denied'); }
+ if(!denied)throw Error('Retired direct RPC was not denied');
+ await db.exec('reset role');
+ await db.exec(deletion);
+ console.log('Prompt 6 retirement rerun, data-loss guard, revoked RPC and empty-only deletion passed.');
  await db.exec(`insert into auth.users(id,raw_user_meta_data) values
  ('11111111-1111-4111-8111-111111111111','{"display_name":"Test A"}'),
  ('22222222-2222-4222-8222-222222222222','{"display_name":"Test B"}'),

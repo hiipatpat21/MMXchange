@@ -1,10 +1,10 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LearningIllustration } from "@/components/ui/learning-illustration";
 
 const steps = [
-  { title: "Bring what you know", text: "Add skills you can teach and a few you’re curious about." },
-  { title: "Find your people", text: "Meet a partner with complementary skills, or pick a group session." },
+  { title: "Bring what you know", text: "Set up your profile. Add skills if you want, or skip them for now." },
+  { title: "Find your people", text: "Meet a partner with complementary skills, or browse individual tutors." },
   { title: "Make it happen", text: "Plan a time, learn together, and share how it went." },
 ];
 

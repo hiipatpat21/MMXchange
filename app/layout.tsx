@@ -11,7 +11,7 @@ const jakarta = localFont({
 
 export const metadata: Metadata = {
   title: { default: "MMXchange", template: "%s | MMXchange" },
-  description: "Share what you know. Learn something new through student skill exchanges and group sessions.",
+  description: "Share what you know. Learn something new through student skill exchanges and individual tutoring.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

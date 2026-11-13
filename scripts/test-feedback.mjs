@@ -50,7 +50,6 @@ for (const fields of [{ rating: "0" }, { rating: "6" }, { rating: "2.5" }, { rat
 assert.equal(calls.length, 0, "Bad input must not reach RPC");
 signedIn = false;
 assert.ok((await actions.submitExchangeReview(null, form()))?.error);
-assert.ok((await actions.submitSessionFeedback(null, form({ helpful: "yes" })))?.error);
 assert.equal(calls.length, 0);
 signedIn = true;
 assert.ok((await actions.submitExchangeReview(null, form()))?.message);
@@ -60,15 +59,9 @@ assert.equal(calls.at(-1).args.p_rating, 5);
 assert.equal(Object.keys(calls.at(-1).args).length, 3, "Review identity must be derived in SQL, never forwarded from forms");
 assert.ok(invalidated.some(args => args[0] === `/exchanges/${id}`));
 assert.ok(invalidated.some(args => args[0] === "/students/[id]"));
-assert.ok((await actions.submitSessionFeedback(null, form({ helpful: "maybe" })))?.error);
-assert.ok((await actions.submitSessionFeedback(null, form({ helpful: "no", comment: "  " })))?.message);
-assert.equal(calls.at(-1).args.p_helpful, false);
-assert.equal(calls.at(-1).args.p_comment, null);
-assert.ok(invalidated.some(args => args[0] === `/sessions/${id}`));
 for (const rejected of ["not_allowed", "not_completed", "already_reviewed", "not_registered", "is_organizer", "already_submitted"]) {
   code = rejected;
   assert.ok((await actions.submitExchangeReview(null, form()))?.error);
-  assert.ok((await actions.submitSessionFeedback(null, form({ helpful: "yes" })))?.error);
 }
 code = "ok"; failed = true;
 assert.ok((await actions.submitExchangeReview(null, form()))?.error);
@@ -82,10 +75,10 @@ assert.ok((await actions.submitReport(null, report()))?.error);
 signedIn = true; targetExists = false;
 assert.ok((await actions.submitReport(null, report()))?.error);
 targetExists = true;
-assert.ok((await actions.submitReport(null, report({ targetType: "session_feedback", targetId: `${id}:${actor}` })))?.message);
+assert.ok((await actions.submitReport(null, report()))?.message);
 assert.equal(calls.at(-1).table, "reports");
 assert.equal(calls.at(-1).row.reporter_id, actor);
-assert.equal(calls.at(-1).row.target_id, `${id}:${actor}`);
+assert.equal(calls.at(-1).row.target_id, id);
 assert.equal(calls.at(-1).row.status, undefined, "Report status uses the database's open default");
 for (const [targetType, table] of [["forum_post", "forum_posts"], ["forum_comment", "forum_comments"]]) {
   assert.ok((await actions.submitReport(null, report({ targetType })))?.message);

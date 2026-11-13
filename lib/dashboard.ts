@@ -17,39 +17,9 @@ export const getDashboardMatches = cache(async () => {
   return getMatchesForUser(supabase, user.id, { limit: 3 });
 });
 
-export type DashboardSuggestionInput = {
-  hasTeachingSkill: boolean;
-  hasMatches: boolean;
-  hasRegistration: boolean;
-  acceptedExchangeId: string | null;
-  hasHosted: boolean;
-};
-
-// First applicable rule wins. These rules suggest an action, not a score.
+export type DashboardSuggestionInput = { hasTeachingSkill: boolean; hasMatches: boolean; acceptedExchangeId: string | null };
 export function chooseDashboardSuggestion(input: DashboardSuggestionInput) {
-  if (!input.hasTeachingSkill) return {
-    title: "Add a skill you can teach",
-    reason: "Offering a skill lets you arrange a mutual exchange with another student.",
-    href: "/skills", label: "Add a teaching skill",
-  };
-  if (!input.hasMatches && !input.hasRegistration) return {
-    title: "Try a group learning session",
-    reason: "There are no matching students yet, and you have not joined a group session. Group learning does not require a swap.",
-    href: "/sessions", label: "Browse group sessions",
-  };
-  if (input.acceptedExchangeId) return {
-    title: "Schedule your first exchange session",
-    reason: "You have an accepted exchange that is waiting for a teaching session.",
-    href: `/exchanges/${input.acceptedExchangeId}#schedule-session`, label: "Schedule a session",
-  };
-  if (!input.hasHosted) return {
-    title: "Share what you know: host a session",
-    reason: "You have a teaching skill and have not hosted a group session yet.",
-    href: "/sessions/new", label: "Host a session",
-  };
-  return {
-    title: "Choose your next learning partner",
-    reason: "Explore students who share your learning interests whenever you are ready for another exchange.",
-    href: "/discover", label: "Discover students",
-  };
+  if (input.acceptedExchangeId) return { title: "Choose a shared hour", reason: "Your accepted exchange is ready to schedule. Set availability first if you have not already.", href: `/exchanges/${input.acceptedExchangeId}#schedule-session`, label: "Schedule your exchange" };
+  if (!input.hasTeachingSkill || !input.hasMatches) return { title: "Find someone to learn from", reason: "Browse tutors without adding skills. A free swap needs complementary skills; individual paid lessons do not need a return skill.", href: "/discover?view=browse", label: "Browse tutors" };
+  return { title: "Choose your next learning partner", reason: "Explore students whose skills complement yours.", href: "/discover", label: "Find a partner" };
 }

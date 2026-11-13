@@ -54,13 +54,8 @@ assert.equal(writes[0].row.sender_id, actor, "Sender must come from server authe
 assert.equal(writes[0].row.exchange_id, id);
 assert.ok(invalidated.some(args => args[0] === `/messages/${id}`));
 assert.ok(invalidated.some(args => args[0] === "/messages"));
-assert.ok((await actions.postAnnouncement(null, form("x".repeat(1001))))?.error);
-assert.ok((await actions.postAnnouncement(null, form("Bring your notes")))?.message);
-assert.equal(writes.at(-1).table, "session_announcements");
-assert.equal(writes.at(-1).row.author_id, actor, "Author must come from server authentication");
 denied = true;
 assert.ok((await actions.sendMessage(null, form("not allowed")))?.error);
-assert.ok((await actions.postAnnouncement(null, form("not allowed")))?.error);
 assert.ok((await actions.markThreadRead(id, "2026-01-01T00:00:00Z"))?.error);
 denied = false;
 const before = writes.length;

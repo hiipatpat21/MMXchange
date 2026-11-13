@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { LearningIllustration } from "@/components/ui/learning-illustration";
 
 export function TwoWays() {
@@ -13,12 +13,12 @@ export function TwoWays() {
           <p className="font-medium text-primary">Both of you teach. Both of you learn.</p>
           <Link href="/discover" className="landing-text-link">Find an exchange partner <span aria-hidden="true">→</span></Link>
         </div>
-        <LearningIllustration scene="group" alt="Three students learning together around a notebook and laptop" sizes="(max-width: 767px) 100vw, 45vw" className="mx-auto w-full max-w-sm md:col-start-2 md:row-start-2" />
+        <LearningIllustration scene="curious" alt="A student choosing what to learn next" sizes="(max-width: 767px) 100vw, 45vw" className="mx-auto w-full max-w-sm md:col-start-2 md:row-start-2" />
         <div className="space-y-4 md:col-start-1 md:row-start-2">
-          <h3 className="text-2xl font-semibold">A little group energy.</h3>
-          <p>Join a workshop or learning session hosted by a student who knows the topic. Or bring people together and host your own.</p>
-          <p className="font-medium text-primary">Come to learn. No swap required.</p>
-          <Link href="/sessions" className="landing-text-link">Explore group sessions <span aria-hidden="true">→</span></Link>
+          <h3 className="text-2xl font-semibold">Learn with a tutor.</h3>
+          <p>No skill to offer in return? Browse individual tutors and their listed lesson fees. Paid requests open when payment setup is ready.</p>
+          <p className="font-medium text-primary">Your skills are optional. Tutor fees are agreed before payment.</p>
+          <Link href="/discover?view=browse" className="landing-text-link">Browse tutors <span aria-hidden="true">→</span></Link>
         </div>
       </div>
     </section>

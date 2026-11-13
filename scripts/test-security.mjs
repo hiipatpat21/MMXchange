@@ -38,7 +38,8 @@ for (const invalid of ["https://localhost", "https://127.0.0.1", "https://[::1]"
 env.NEXT_PUBLIC_SITE_URL = "https://example.test/";
 assert.equal(redirects.getSiteUrl(), "https://example.test");
 const { notificationDestination } = load("lib/notifications.ts", { "@/lib/supabase/server": {} });
-for (const section of ["exchanges", "sessions", "messages", "forum", "lessons"]) assert.equal(notificationDestination(`/${section}/${actor}`), `/${section}/${actor}`);
+assert.equal(notificationDestination(`/sessions/${actor}`), "/exchanges?notice=groups-retired");
+for (const section of ["exchanges", "messages", "forum", "lessons"]) assert.equal(notificationDestination(`/${section}/${actor}`), `/${section}/${actor}`);
 for (const route of [null, "//evil.example", "https://evil.example", `/forum/${actor}/../login`, "/forum/not-a-uuid", `/forum/${actor}?next=https://evil.example`]) assert.equal(notificationDestination(route), "/notifications");
 env.NEXT_PUBLIC_SUPABASE_URL = "https://test-project.example";
 const avatars = load("lib/avatars.ts");
