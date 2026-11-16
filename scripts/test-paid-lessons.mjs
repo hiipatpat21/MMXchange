@@ -14,6 +14,11 @@ const lib=load("lib/paid-lessons.ts",{"@/lib/relations":relations});
 for(const [php,expected] of [["0.01",1],["1.1",110],["10000.00",1000000],[" 250.50 ",25050]]) assert.equal(lib.parsePhp(php),expected);
 for(const php of ["0","-1","1.001","1e2","10000.01","Infinity","1,000","", "01.00"]) assert.equal(lib.parsePhp(php),null);
 assert.ok(lib.formatPhp(1050).includes("10.50"));
+// Every valid amount round-trips exactly through integer centavos, including limits.
+for(const amount of [1,9,10,99,100,101,999999,1000000]) {
+ const text=`${Math.floor(amount/100)}.${String(amount%100).padStart(2,'0')}`;
+ assert.equal(lib.parsePhp(text),amount);
+}
 const a="11111111-1111-4111-8111-111111111111",b="22222222-2222-4222-8222-222222222222",c="33333333-3333-4333-8333-333333333333",offer="44444444-4444-4444-8444-444444444444";
 let skillRows=[{profile_id:a,skill_id:1,kind:"teach",skills:{name:"Design"}},{profile_id:a,skill_id:2,kind:"learn",skills:{name:"Python"}},{profile_id:b,skill_id:2,kind:"teach",skills:{name:"Python"}},{profile_id:b,skill_id:1,kind:"learn",skills:{name:"Design"}}];
 let queryFailed=false;

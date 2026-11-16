@@ -33,6 +33,7 @@ const url=`http://127.0.0.1:${server.address().port}/`,browser=await Browser.lau
 async function until(test,message){for(let i=0;i<60;i++){if(await test())return;await new Promise(done=>setTimeout(done,100));}throw Error(message);}
 try {
  const a=await browser.newPage(),b=await browser.newPage();await a.goto(url);await b.goto(url);
+ await until(async()=>(await a.eval(()=>!!window.controller))&&(await b.eval(()=>!!window.controller)),'Both tabs must load the controller before checking ownership');
  await until(async()=>((await a.eval(()=>window.snapshot?.meetings.length??0))+(await b.eval(()=>window.snapshot?.meetings.length??0)))===1,'Two tabs failed to elect one visible banner');
  const leader=(await a.eval(()=>window.snapshot?.meetings.length??0))?a:b,other=leader===a?b:a;
  assert.equal(await leader.eval(()=>window.announcements.length),1);assert.equal(await other.eval(()=>window.announcements.length),0);
@@ -51,4 +52,12 @@ try {
  await until(async()=>(await a.eval(()=>window.snapshot.meetings.length))===0,'Cancellation did not clear the banner');
  await a.eval(()=>window.controller.stop());
  console.log('Real Chrome tab checks passed: one owner/banner, reload dismissal, rescheduled occurrence, wall-clock skew and cancellation reconciliation.');
-} finally {await browser.close();await new Promise(done=>server.close(done));}
+} finally {
+ await browser.close();
+ // The isolated test server must not wait for Chrome's pooled HTTP connections.
+ await new Promise(done=>{server.close(done);server.closeAllConnections();});
+}
+// This CLI reaches here only after assertions AND teardown succeed. The helper's
+// exit hook cleans its owned Chrome process tree; Windows descendant pipes can
+// otherwise keep Node alive after Browser.close. Errors above still exit nonzero.
+process.exit(0);

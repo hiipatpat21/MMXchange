@@ -18,7 +18,7 @@ const booking={status:'reserved',starts_at:'2026-11-14T00:00:00Z'};
 assert.equal(lessonGuide({...base,status:'pending',isTutor:true}).label,'Review request');
 assert.equal(lessonGuide(base).href,`/lessons/${id}#schedule`);
 assert.equal(lessonGuide({...base,booking,payment:{status:'awaiting_receipt'}}).label,'Upload receipt');
-assert.match(lessonGuide({...base,booking,payment:{status:'rejected'}}).text,/replacement/);
+assert.match(lessonGuide({...base,booking,payment:{status:'rejected'}}).text,/new receipt/);
 assert.equal(lessonGuide({...base,booking,payment:{status:'submitted'}}).label,'View submitted receipt');
 assert.equal(lessonGuide({...base,isTutor:true,booking,payment:{status:'submitted'}}).label,'Review payment');
 assert.equal(lessonGuide({...base,status:'cancelled',booking,payment:{status:'submitted'}}).label,'View lesson');
@@ -65,5 +65,5 @@ assert.match(optionsHtml(pair),/Request free swap/);assert.doesNotMatch(optionsH
 const skillLess={...pair,mutual:false,teachesMe:[],iTeachThem:[]};
 assert.match(optionsHtml(skillLess),/Request paid lesson/);assert.doesNotMatch(optionsHtml(skillLess),/Request free swap/);
 assert.doesNotMatch(optionsHtml({...skillLess,ready:false}),/Request paid lesson/);
-assert.match(optionsHtml({...skillLess,offers:[]}),/No paid lesson is available/);
+assert.match(optionsHtml({...skillLess,offers:[]}),/no paid offers yet/);
 console.log('Guided navigation checks passed: role/state-specific actions, confirmed-only Home, bounded previews, explicit errors, optional skills, and retained account destinations.');

@@ -27,7 +27,7 @@ async function ProfileLoader() {
 export default function ProfilePage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <PageIntro title="A little about you" description="Let other students get to know their next learning partner. Your email stays private." />
+      <PageIntro title="A little about you" description="Update your details and available hours." />
       <Suspense fallback={<LoadingState label="Loading your profile..." variant="form" />}>
         <ProfileLoader />
       </Suspense>

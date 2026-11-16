@@ -40,3 +40,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local design directions, inspection reports, and screenshots
+.taste-skill/
+
+# Local Markdown documents
+*.md
+
+# Local SQL files
+*.sql

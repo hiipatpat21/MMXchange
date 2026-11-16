@@ -19,11 +19,11 @@ export async function PaymentPanel({ id, page: rawPage }: { id: string; page?: s
   const tutor = r.tutor_id === user.id;
   const open = r.status === "accepted" && b?.status === "reserved" && Date.parse(b.starts_at) > now;
   const rows = history.data?.slice(0, 5) ?? [];
-  const instructions = p.qr_asset_id ? <div className="space-y-3"><PaymentImage client={client} asset={p.qr_asset_id} label="Agreed GCash QR" />{p.instructions_snapshot && <p className="whitespace-pre-wrap break-words">{p.instructions_snapshot}</p>}<p className="text-sm text-muted-foreground">These instructions stay fixed for this lesson, even if the tutor changes their payment setup.</p></div> : open ? <PaymentDecision id={id} command="prepare" /> : <p className="text-sm">{p.status === "confirmed" ? "This older payment has no saved QR. Contact your tutor if you need its payment details." : "Reserve a shared hour to request payment instructions. No payment is due yet."}</p>;
+  const instructions = p.qr_asset_id ? <div className="space-y-3"><PaymentImage client={client} asset={p.qr_asset_id} label="Agreed GCash QR" />{p.instructions_snapshot && <p className="whitespace-pre-wrap break-words">{p.instructions_snapshot}</p>}<p className="text-sm text-muted-foreground">Payment details are fixed for this lesson.</p></div> : open ? <PaymentDecision id={id} command="prepare" /> : <p className="text-sm">{p.status === "confirmed" ? "This older payment has no saved QR. Contact your tutor if you need its payment details." : "Reserve a shared hour before paying."}</p>;
   return <section id="payment" className="space-y-5 rounded-xl border bg-card p-5">
     <div className="space-y-1"><h2 className="text-xl font-semibold">Lesson payment</h2><p className="font-semibold text-primary">{formatPhp(p.amount_centavos)} · {paymentLabels[p.status] ?? "Not requested"}</p>{b && <p className="text-sm">{formatDateTime(b.starts_at)} (Philippine time)</p>}</div>
-    <p className="text-sm text-muted-foreground">{tutor ? "Check the transfer in your own GCash account before reviewing. A receipt image does not verify a bank transfer." : "Pay outside MMXchange using the agreed QR below. A receipt is a submitted image, not bank verification. Never provide a login, PIN or OTP."}</p>
-    {b?.status === "reserved" && <p className="text-sm">This time is reserved. The meeting becomes confirmed only after the tutor checks the transfer and marks payment received.</p>}
+    <p className="text-sm text-muted-foreground">{tutor ? "Check your GCash balance before confirming payment." : "Pay in GCash, then upload your receipt. Never share your PIN or OTP."}</p>
+    {b?.status === "reserved" && <p className="text-sm">Time reserved. Waiting for tutor payment confirmation.</p>}
     {p.qr_asset_id && (tutor || p.status === "confirmed" || r.status !== "accepted") ? <details className="disclosure"><summary>Agreed payment instructions</summary>{instructions}</details> : instructions}
     {open && !tutor && ["awaiting_receipt", "rejected"].includes(p.status) && <PaymentUploadForm kind="receipt" id={id} />}
     <details className="disclosure" open={p.status === "submitted" || p.status === "rejected"}><summary>Receipt and decision history</summary><div className="space-y-5 pb-3">
@@ -31,6 +31,6 @@ export async function PaymentPanel({ id, page: rawPage }: { id: string; page?: s
       <nav aria-label="Receipt history pages" className="flex flex-wrap gap-4">{page > 1 && <Link className="text-primary underline" href={`/lessons/${id}?receiptsPage=${page - 1}#payment`}>Newer receipts</Link>}{(history.data?.length ?? 0) > 5 && <Link className="text-primary underline" href={`/lessons/${id}?receiptsPage=${page + 1}#payment`}>Older receipts</Link>}</nav>
     </div></details>
     {open && tutor && p.status === "submitted" && p.latest_receipt_id && <div className="space-y-4"><PaymentDecision id={id} receipt={p.latest_receipt_id} command="confirm" /><details className="disclosure"><summary>Reject this receipt</summary><PaymentDecision id={id} receipt={p.latest_receipt_id} command="reject" /></details></div>}
-    <p className="text-sm text-muted-foreground">If a lesson is cancelled after money is sent, arrange refunds directly with your learning partner. Evidence stays available; MMXchange does not issue or guarantee refunds.</p>
+    <p className="text-sm text-muted-foreground">Arrange refunds directly with your partner. MMXchange does not issue refunds.</p>
   </section>;
 }

@@ -88,7 +88,7 @@ async function ExchangeDetail({ params }: { params: Promise<{ id: string }> }) {
       {sessionsError ? <p role="alert" className="text-destructive">Could not load sessions. Please reload to try again. On a new setup, run the prompt 3 SQL first.</p> : <ExchangeSessionList exchangeId={id} sessions={sessions} teachers={teachers} editable={editable} now={now} />}
       {(exchange.status === "scheduled" || exchange.status === "completed") && <details className="disclosure" open={!!progress?.canComplete}>
         <summary>Completion confirmations</summary>
-        <p className="text-sm text-muted-foreground">Both students must confirm after at least one non-cancelled session has started. Confirm only when you consider the exchange finished.</p>
+        <p className="text-sm text-muted-foreground">Finished learning? Both students need to confirm completion.</p>
         <ul className="space-y-2 text-sm">
           {[{ name: teachers[0].name, at: exchange.requester_completed_at }, { name: teachers[1].name, at: exchange.recipient_completed_at }].map((person, index) => <li key={teachers[index].id} className="break-words">{person.name}: {person.at ? `Confirmed ${formatDateTime(person.at)}` : "Not confirmed yet."}</li>)}
         </ul>

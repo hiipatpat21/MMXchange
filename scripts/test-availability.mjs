@@ -22,6 +22,12 @@ assert.equal(lib.isCalendarDay("2028-02-29"),true);
 const now=Date.parse("2026-11-13T16:15:00Z");
 assert.equal(lib.meetingDateBounds(now).min,"2026-11-14");
 assert.equal(lib.validMeetingStart("2026-11-14T00:30:00+08:00",now),true);
+// Exact inclusive horizon; no rounding may admit a past or off-grid instant.
+const aligned=Date.parse('2026-11-14T00:00:00+08:00');
+assert.equal(lib.validMeetingStart(new Date(aligned+30*86400000).toISOString(),aligned),true);
+assert.equal(lib.validMeetingStart(new Date(aligned+30*86400000+1800000).toISOString(),aligned),false);
+assert.equal(lib.validMeetingStart(new Date(aligned).toISOString(),aligned),false);
+assert.equal(lib.validMeetingStart('2026-11-14T00:30:00.001+08:00',aligned),false);
 for(const value of ["2026-11-14T00:00:00+08:00","2026-11-14T00:15:00+08:00","2026-11-14T00:30:01+08:00","2026-12-20T00:30:00+08:00","2026-11-14T09:30"])assert.equal(lib.validMeetingStart(value,now),false);
 const id="11111111-1111-4111-8111-111111111111",other="22222222-2222-4222-8222-222222222222";
 let signedIn=false,code="ok",failed=false,slotRows=[];
