@@ -15,5 +15,5 @@ async function RecoveryLoader() {
 }
 
 export default function ResetPasswordPage() {
-  return <section className="surface-card space-y-6 p-6 sm:p-8"><header className="space-y-3"><h1 className="text-3xl font-semibold tracking-tight">Choose a new password.</h1><p className="text-sm text-muted-foreground">Set a password for the account from your reset link.</p></header><Suspense fallback={<LoadingState label="Checking your reset link..." variant="form" />}><RecoveryLoader /></Suspense></section>;
+  return <section className="surface-card space-y-6 p-6 sm:p-8"><header className="space-y-3"><h1 className="text-3xl font-semibold tracking-tight">Choose a new password.</h1></header><Suspense fallback={<LoadingState label="Checking your reset link..." variant="form" />}><RecoveryLoader /></Suspense></section>;
 }

@@ -10,13 +10,11 @@ type Skill = { id: number; name: string; category: string };
 
 export function SkillSection({
   title,
-  description,
   kind,
   chosen,
   available,
 }: {
   title: string;
-  description: string;
   kind: "teach" | "learn";
   chosen: Skill[];
   available: Skill[];
@@ -26,11 +24,10 @@ export function SkillSection({
     <section className="space-y-4 surface-card p-6">
       <div>
         <h2 className="text-lg font-semibold">{title}</h2>
-        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
 
       {chosen.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Nothing here yet. Add a skill below.</p>
+        <p className="text-sm text-muted-foreground">No skills added.</p>
       ) : (
         <ul className="flex flex-wrap gap-2">
           {chosen.map((skill) => (
@@ -68,7 +65,7 @@ export function SkillSection({
         </select>
         </div>
         <Button type="submit" disabled={pending}>{pending ? "Adding…" : "Add"}</Button>
-      </form> : <p className="text-sm text-muted-foreground">All available skills are already in your lists. Remove one to change how you use it.</p>}
+      </form> : <p className="text-sm text-muted-foreground">All skills added.</p>}
       {state?.error && <p role="alert" className="text-sm text-destructive">{state.error}</p>}
       {state?.message && <p role="status" className="text-sm text-primary">{state.message}</p>}
     </section>

@@ -13,8 +13,8 @@ export async function LessonThread({ id, userId, accepted, open, cursor }: { id:
   const { data, error } = await query;
   if (error) return <p role="alert">Could not load messages. Refresh to try again.</p>;
   const rows = (data ?? []).slice(0,50), oldest = rows.at(-1);
-  return <div className="space-y-4"><p className="text-sm text-muted-foreground">Private chat. Refresh for new messages.</p>
-    {rows.length ? <ol className="space-y-3">{[...rows].reverse().map(row => <li key={row.id} className="rounded-xl border bg-card p-4"><p className="text-sm font-medium">{row.sender_id === userId ? "You" : "Your learning partner"}</p><p className="whitespace-pre-wrap break-words">{row.body}</p><p className="text-xs text-muted-foreground">{formatDateTime(row.created_at)}</p></li>)}</ol> : <p>No messages yet. Start the conversation below.</p>}
+  return <div className="space-y-4">
+    {rows.length ? <ol className="space-y-3">{[...rows].reverse().map(row => <li key={row.id} className="rounded-xl border bg-card p-4"><p className="text-sm font-medium">{row.sender_id === userId ? "You" : "Your learning partner"}</p><p className="whitespace-pre-wrap break-words">{row.body}</p><p className="text-xs text-muted-foreground">{formatDateTime(row.created_at)}</p></li>)}</ol> : <p>No messages yet.</p>}
     {(data?.length ?? 0) > 50 && oldest && <Link className="inline-flex min-h-11 items-center text-primary underline" href={`/lessons/${id}?${new URLSearchParams({ before: oldest.created_at, beforeId: oldest.id })}#conversation`}>Older messages</Link>}
     {parsed.success && <Link className="inline-flex min-h-11 items-center text-primary underline" href={`/lessons/${id}#conversation`}>Latest messages</Link>}
     {open ? <LessonComposer id={id} kind="message" /> : <p>This conversation is read-only because the lesson has ended.</p>}

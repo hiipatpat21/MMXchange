@@ -46,7 +46,7 @@ export function AvatarUpload({ displayName, avatarUrl }: { displayName: string; 
     }
   }
   return <section className="surface-card space-y-5 p-5 sm:p-7" aria-labelledby="avatar-heading">
-    <div className="flex items-center gap-4"><StudentAvatar name={displayName} url={avatarUrl} className="size-20" /><div><h2 id="avatar-heading" className="text-lg font-semibold">Profile photo</h2><p className="text-sm text-muted-foreground">Optional. Initials are shown when you have no photo.</p></div></div>
+    <div className="flex items-center gap-4"><StudentAvatar name={displayName} url={avatarUrl} className="size-20" /><div><h2 id="avatar-heading" className="text-lg font-semibold">Profile photo</h2></div></div>
     <form onSubmit={upload} className="space-y-4">
       <div className="space-y-2"><Label htmlFor="avatarFile">Choose a photo</Label><input id="avatarFile" name="avatarFile" type="file" accept={avatarMimeTypes.join(",")} required disabled={pending} aria-describedby="avatar-hint" className="block min-h-11 w-full min-w-0 rounded-xl border border-input bg-card p-2 text-sm file:mr-3 file:min-h-11 file:rounded-lg file:border-0 file:bg-secondary file:px-3 file:font-medium" /><p id="avatar-hint" className="text-sm text-muted-foreground">JPG, PNG, or WebP, up to 2 MB. Photos are public to anyone with the image link.</p></div>
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}{message && <p role="status" className="text-sm text-primary">{message}</p>}

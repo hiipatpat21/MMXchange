@@ -43,5 +43,5 @@ async function MessageViews({ searchParams }: { searchParams: MessageParams }) {
   return <div className="space-y-5"><nav aria-label="Conversation type" className="section-tabs"><Link href="/messages" aria-current={!paid ? "page" : undefined}>Skill swaps</Link><Link href="/messages?view=paid" aria-current={paid ? "page" : undefined}>Paid lessons</Link></nav>{paid ? <PaidConversations searchParams={searchParams} /> : <Conversations searchParams={searchParams} />}</div>;
 }
 export default function MessagesPage({ searchParams }: { searchParams: MessageParams }) {
-  return <div className="mx-auto max-w-3xl space-y-6"><PageIntro title="Messages" description="Your private conversations. Refresh to check for replies."><RefreshButton /></PageIntro><Suspense fallback={<LoadingState label="Loading conversations..." />}><MessageViews searchParams={searchParams} /></Suspense></div>;
+  return <div className="mx-auto max-w-3xl space-y-6"><PageIntro title="Messages"><RefreshButton /></PageIntro><Suspense fallback={<LoadingState label="Loading conversations..." />}><MessageViews searchParams={searchParams} /></Suspense></div>;
 }

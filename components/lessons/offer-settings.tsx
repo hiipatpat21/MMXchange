@@ -14,7 +14,7 @@ export async function OfferSettings() {
   if (skills.error || offers.error) return <p role="alert">Could not load paid offers. Please reload.</p>;
   const ids = [...new Set([...(skills.data ?? []).map(row => row.skill_id), ...(offers.data ?? []).map(row => row.skill_id)])];
   return <details className="disclosure"><summary>Paid teaching offers (optional)</summary><div className="space-y-4 pb-4">
-    <p className="text-sm text-muted-foreground">Set a price, enable the skill, then save the offering. Upload your QR below.</p>
+
     <PaymentSetup />
     {ids.length ? ids.map(id => { const skill = skills.data?.find(row => row.skill_id === id); const offer = offers.data?.find(row => row.skill_id === id); return <OfferForm key={id} skill={id} name={pickOne<{ name: string }>(skill?.skills ?? offer?.skills)?.name ?? "Skill"} price={offer?.price_centavos} enabled={offer?.enabled} teaching={!!skill} />; }) : <p>Add a teaching skill above to create an offer.</p>}
   </div></details>;

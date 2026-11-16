@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { meetingUrlHint } from "@/lib/meeting-links";
 
 const selectClass = "h-11 w-full min-w-0 rounded-xl border border-input bg-card px-3 text-base sm:text-sm focus-visible:outline-2 focus-visible:outline-primary";
 
@@ -38,8 +37,8 @@ export function ExchangeSessionForm({ exchangeId, teachers, session, now }: { ex
       </div>
       <div className="space-y-2">
         <Label htmlFor={`${prefix}-venue`}>{format === "online" ? "Online meeting URL" : "In-person venue"}</Label>
-        <Input id={`${prefix}-venue`} name="venue" type={format === "online" ? "url" : "text"} minLength={2} maxLength={200} required defaultValue={session?.venue ?? ""} placeholder={format === "online" ? "https://meet.example.com/your-meeting" : "Public meeting place"} aria-describedby={`${prefix}-venue-hint`} className="h-10" />
-        <p id={`${prefix}-venue-hint`} className="text-sm text-muted-foreground">{format === "online" ? meetingUrlHint : "Choose a public, easy-to-find place."}</p>
+        <Input id={`${prefix}-venue`} name="venue" type={format === "online" ? "url" : "text"} minLength={2} maxLength={200} required defaultValue={session?.venue ?? ""} placeholder={format === "online" ? "https://meet.example.com/your-meeting" : "Public meeting place"} className="h-10" />
+
       </div>
       <div className="space-y-2">
         <Label htmlFor={`${prefix}-notes`}>What to prepare (optional)</Label>

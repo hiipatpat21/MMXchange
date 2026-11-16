@@ -41,7 +41,7 @@ async function RequestLoader({ searchParams }: { searchParams: SearchParams }) {
 export default function NewExchangePage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <header><h1 className="page-heading">Request an exchange</h1><p className="mt-1 text-muted-foreground">Offer a skill and ask to learn one in return.</p></header>
+      <header><h1 className="page-heading">Request an exchange</h1></header>
       <Suspense fallback={<LoadingState label="Loading request form..." variant="form" />}><RequestLoader searchParams={searchParams} /></Suspense>
     </div>
   );

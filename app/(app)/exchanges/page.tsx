@@ -78,5 +78,5 @@ async function LearningContent({ searchParams }: { searchParams: SearchParams })
   </div>;
 }
 export default function ExchangesPage({ searchParams }: { searchParams: SearchParams }) {
-  return <div className="space-y-6"><PageIntro title="My learning" description="Continue a request, schedule a meeting, or check a payment." /><Suspense fallback={<LoadingState label="Loading your learning..." />}><LearningContent searchParams={searchParams} /></Suspense></div>;
+  return <div className="space-y-6"><PageIntro title="My learning" /><Suspense fallback={<LoadingState label="Loading your learning..." />}><LearningContent searchParams={searchParams} /></Suspense></div>;
 }

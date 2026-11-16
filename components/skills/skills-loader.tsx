@@ -31,14 +31,12 @@ export async function SkillsLoader({ onboarding = false }: { onboarding?: boolea
     <div className="grid gap-6 md:grid-cols-2">
       <SkillSection
         title="Skills I can teach"
-        description="What could you help another student learn?"
         kind="teach"
         chosen={teach}
         available={available}
       />
       <SkillSection
         title="Skills I want to learn"
-        description="What would you like someone to teach you?"
         kind="learn"
         chosen={learn}
         available={available}

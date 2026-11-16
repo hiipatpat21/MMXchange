@@ -9,7 +9,7 @@ export async function PaymentSetup() {
   if (method.error) return <p role="alert">Could not load payment settings. Please reload.</p>;
   return <section className="space-y-4 rounded-xl border bg-card p-4">
     <h3 className="text-lg font-semibold">Receive payments through GCash</h3>
-    <p className="text-sm text-muted-foreground">Upload your GCash QR to receive lesson payments.</p>
+
     {method.data && <PaymentImage client={client} asset={method.data.qr_asset_id} label="Your GCash QR" />}
     <PaymentUploadForm kind="qr" instructions={method.data?.instructions} />
     <p className="text-sm text-muted-foreground">Payments happen in GCash. Never share your PIN or OTP.</p>
